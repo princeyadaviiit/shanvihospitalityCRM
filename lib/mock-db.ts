@@ -47,11 +47,64 @@ type MockLeadNote = {
   createdAt: Date;
 };
 
+type MockItinerary = {
+  id: string;
+  companyId: string;
+  leadId: string;
+  title: string;
+  destination: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  markup: number;
+  totalCost: number;
+  finalPrice: number;
+  currency: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type MockItineraryDay = {
+  id: string;
+  itineraryId: string;
+  dayNumber: number;
+  title: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type MockItineraryLineItem = {
+  id: string;
+  dayId: string;
+  category: any;
+  description: string;
+  cost: number;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+type MockBooking = {
+  id: string;
+  companyId: string;
+  leadId: string;
+  itineraryId: string;
+  bookingNumber: string;
+  status: any;
+  totalAmount: number;
+  currency: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 class MockDatabase {
   companies: MockCompany[] = [];
   users: MockUser[] = [];
   leads: MockLead[] = [];
   leadNotes: MockLeadNote[] = [];
+  itineraries: MockItinerary[] = [];
+  itineraryDays: MockItineraryDay[] = [];
+  itineraryLineItems: MockItineraryLineItem[] = [];
+  bookings: MockBooking[] = [];
 
   private idCounter = 1;
   private nextId(prefix: string) {
@@ -175,6 +228,14 @@ class MockDatabase {
       this.leads.push(item);
       return this.formatLead(item, include);
     },
+    findUnique: async ({ where, include }: { where: any; include?: any }) => {
+      const item = this.leads.find((l) => {
+        if (where.id) return l.id === where.id;
+        return false;
+      });
+      if (!item) return null;
+      return this.formatLead(item, include);
+    },
     findFirst: async ({ where, include }: { where: any; include?: any }) => {
       const item = this.leads.find((l) => {
         if (where.id && l.id !== where.id) return false;
@@ -259,6 +320,271 @@ class MockDatabase {
       return { count: 1 };
     },
   };
+
+  itinerary = {
+    create: async ({ data, include }: { data: any; include?: any }) => {
+      const item: MockItinerary = {
+        id: this.nextId('itin'),
+        companyId: data.companyId,
+        leadId: data.leadId,
+        title: data.title,
+        destination: data.destination,
+        startDate: data.startDate ? new Date(data.startDate) : null,
+        endDate: data.endDate ? new Date(data.endDate) : null,
+        markup: data.markup || 0,
+        totalCost: data.totalCost || 0,
+        finalPrice: data.finalPrice || 0,
+        currency: data.currency || 'INR',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.itineraries.push(item);
+
+      // If nested days are provided in create
+      if (data.days?.create && Array.isArray(data.days.create)) {
+        for (const d of data.days.create) {
+          const dayItem: MockItineraryDay = {
+            id: this.nextId('day'),
+            itineraryId: item.id,
+            dayNumber: d.dayNumber,
+            title: d.title,
+            description: d.description || null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          this.itineraryDays.push(dayItem);
+
+          if (d.lineItems?.create && Array.isArray(d.lineItems.create)) {
+            for (const li of d.lineItems.create) {
+              this.itineraryLineItems.push({
+                id: this.nextId('item'),
+                dayId: dayItem.id,
+                category: li.category,
+                description: li.description,
+                cost: li.cost || 0,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              });
+            }
+          }
+        }
+      }
+
+      return this.formatItinerary(item, include);
+    },
+    findUnique: async ({ where, include }: { where: any; include?: any }) => {
+      const item = this.itineraries.find(
+        (it) =>
+          (where.id && it.id === where.id) ||
+          (where.leadId && it.leadId === where.leadId)
+      );
+      if (!item) return null;
+      return this.formatItinerary(item, include);
+    },
+    findFirst: async ({ where, include }: { where: any; include?: any }) => {
+      const item = this.itineraries.find((it) => {
+        if (where.id && it.id !== where.id) return false;
+        if (where.leadId && it.leadId !== where.leadId) return false;
+        if (where.companyId && it.companyId !== where.companyId) return false;
+        return true;
+      });
+      if (!item) return null;
+      return this.formatItinerary(item, include);
+    },
+    update: async ({ where, data, include }: { where: any; data: any; include?: any }) => {
+      const idx = this.itineraries.findIndex((it) => it.id === where.id);
+      if (idx === -1) throw new Error('Itinerary not found');
+      this.itineraries[idx] = {
+        ...this.itineraries[idx],
+        ...data,
+        updatedAt: new Date(),
+      };
+      return this.formatItinerary(this.itineraries[idx], include);
+    },
+    deleteMany: async ({ where }: { where?: any }) => {
+      if (where?.companyId?.in) {
+        const itinIds = this.itineraries
+          .filter((i) => where.companyId.in.includes(i.companyId))
+          .map((i) => i.id);
+        const dayIds = this.itineraryDays
+          .filter((d) => itinIds.includes(d.itineraryId))
+          .map((d) => d.id);
+        this.itineraryLineItems = this.itineraryLineItems.filter((li) => !dayIds.includes(li.dayId));
+        this.itineraryDays = this.itineraryDays.filter((d) => !itinIds.includes(d.itineraryId));
+        this.itineraries = this.itineraries.filter((i) => !where.companyId.in.includes(i.companyId));
+      } else {
+        this.itineraryLineItems = [];
+        this.itineraryDays = [];
+        this.itineraries = [];
+      }
+      return { count: 1 };
+    },
+  };
+
+  itineraryDay = {
+    create: async ({ data, include }: { data: any; include?: any }) => {
+      const item: MockItineraryDay = {
+        id: this.nextId('day'),
+        itineraryId: data.itineraryId,
+        dayNumber: data.dayNumber,
+        title: data.title,
+        description: data.description || null,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.itineraryDays.push(item);
+      const res: any = { ...item };
+      if (include?.lineItems && data.lineItems?.create) {
+        res.lineItems = [];
+        for (const li of data.lineItems.create) {
+          const liItem = {
+            id: this.nextId('item'),
+            dayId: item.id,
+            category: li.category,
+            description: li.description,
+            cost: li.cost || 0,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          };
+          this.itineraryLineItems.push(liItem);
+          res.lineItems.push(liItem);
+        }
+      }
+      return res;
+    },
+    deleteMany: async ({ where }: { where?: any }) => {
+      if (where?.itineraryId) {
+        const dayIds = this.itineraryDays
+          .filter((d) => d.itineraryId === where.itineraryId)
+          .map((d) => d.id);
+        this.itineraryLineItems = this.itineraryLineItems.filter((li) => !dayIds.includes(li.dayId));
+        this.itineraryDays = this.itineraryDays.filter((d) => d.itineraryId !== where.itineraryId);
+      }
+      return { count: 1 };
+    },
+  };
+
+  itineraryLineItem = {
+    create: async ({ data }: { data: any }) => {
+      const item: MockItineraryLineItem = {
+        id: this.nextId('item'),
+        dayId: data.dayId,
+        category: data.category,
+        description: data.description,
+        cost: data.cost || 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.itineraryLineItems.push(item);
+      return { ...item };
+    },
+    deleteMany: async ({ where }: { where?: any }) => {
+      if (where?.dayId) {
+        this.itineraryLineItems = this.itineraryLineItems.filter((li) => li.dayId !== where.dayId);
+      }
+      return { count: 1 };
+    },
+  };
+
+  booking = {
+    create: async ({ data, include }: { data: any; include?: any }) => {
+      const item: MockBooking = {
+        id: this.nextId('book'),
+        companyId: data.companyId,
+        leadId: data.leadId,
+        itineraryId: data.itineraryId,
+        bookingNumber: data.bookingNumber,
+        status: data.status || 'CONFIRMED',
+        totalAmount: data.totalAmount || 0,
+        currency: data.currency || 'INR',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      this.bookings.push(item);
+      const res: any = { ...item };
+      if (include?.lead) {
+        const lead = this.leads.find((l) => l.id === item.leadId);
+        res.lead = lead ? { ...lead } : null;
+      }
+      if (include?.itinerary) {
+        const itin = this.itineraries.find((i) => i.id === item.itineraryId);
+        res.itinerary = itin ? this.formatItinerary(itin, include.itinerary.include) : null;
+      }
+      return res;
+    },
+    findUnique: async ({ where, include }: { where: any; include?: any }) => {
+      const item = this.bookings.find(
+        (b) =>
+          (where.id && b.id === where.id) ||
+          (where.leadId && b.leadId === where.leadId) ||
+          (where.itineraryId && b.itineraryId === where.itineraryId) ||
+          (where.bookingNumber && b.bookingNumber === where.bookingNumber)
+      );
+      if (!item) return null;
+      const res: any = { ...item };
+      if (include?.lead) {
+        const lead = this.leads.find((l) => l.id === item.leadId);
+        res.lead = lead ? { ...lead } : null;
+      }
+      if (include?.itinerary) {
+        const itin = this.itineraries.find((i) => i.id === item.itineraryId);
+        res.itinerary = itin ? this.formatItinerary(itin, include.itinerary.include) : null;
+      }
+      return res;
+    },
+    findFirst: async ({ where, include }: { where: any; include?: any }) => {
+      const item = this.bookings.find((b) => {
+        if (where.id && b.id !== where.id) return false;
+        if (where.leadId && b.leadId !== where.leadId) return false;
+        if (where.companyId && b.companyId !== where.companyId) return false;
+        return true;
+      });
+      if (!item) return null;
+      return { ...item };
+    },
+    findMany: async ({ where }: { where: any }) => {
+      return this.bookings.filter((b) => b.companyId === where.companyId);
+    },
+    deleteMany: async ({ where }: { where?: any }) => {
+      if (where?.companyId?.in) {
+        this.bookings = this.bookings.filter((b) => !where.companyId.in.includes(b.companyId));
+      } else {
+        this.bookings = [];
+      }
+      return { count: 1 };
+    },
+  };
+
+  private formatItinerary(it: MockItinerary, include?: any) {
+    const res: any = { ...it };
+    if (include?.days) {
+      const days = this.itineraryDays
+        .filter((d) => d.itineraryId === it.id)
+        .sort((a, b) => a.dayNumber - b.dayNumber)
+        .map((d) => {
+          const dayRes: any = { ...d };
+          if (include.days.include?.lineItems) {
+            dayRes.lineItems = this.itineraryLineItems.filter((li) => li.dayId === d.id);
+          }
+          return dayRes;
+        });
+      res.days = days;
+    }
+    if (include?.lead) {
+      const lead = this.leads.find((l) => l.id === it.leadId);
+      res.lead = lead ? this.formatLead(lead, include.lead.include) : null;
+    }
+    if (include?.booking) {
+      const booking = this.bookings.find((b) => b.itineraryId === it.id);
+      res.booking = booking ? { ...booking } : null;
+    }
+    if (include?.company) {
+      const company = this.companies.find((c) => c.id === it.companyId);
+      res.company = company ? { ...company } : null;
+    }
+    return res;
+  }
+
 
   private formatUser(u: MockUser, select?: any) {
     if (!select) return { ...u };

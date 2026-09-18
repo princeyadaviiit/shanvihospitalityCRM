@@ -94,3 +94,62 @@ CREATE POLICY "Tenant-scoped lead notes insert" ON lead_notes
     company_id = get_auth_user_company_id()
     AND get_auth_user_role() IN ('admin', 'staff_agent')
   );
+
+-- 5. ITINERARIES POLICIES
+ALTER TABLE itineraries ENABLE ROW LEVEL SECURITY;
+ALTER TABLE itinerary_days ENABLE ROW LEVEL SECURITY;
+ALTER TABLE itinerary_line_items ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Tenant-scoped itineraries select" ON itineraries;
+CREATE POLICY "Tenant-scoped itineraries select" ON itineraries
+  FOR SELECT
+  USING (
+    company_id = get_auth_user_company_id()
+    AND (
+      get_auth_user_role() IN ('admin', 'accounts')
+      OR lead_id IN (
+        SELECT id FROM leads WHERE assigned_agent_id = (SELECT id FROM users WHERE supabase_uid = auth.uid()::text)
+      )
+    )
+  );
+
+DROP POLICY IF EXISTS "Tenant-scoped itineraries mutate" ON itineraries;
+CREATE POLICY "Tenant-scoped itineraries mutate" ON itineraries
+  FOR ALL
+  USING (
+    company_id = get_auth_user_company_id()
+    AND (
+      get_auth_user_role() = 'admin'
+      OR (
+        get_auth_user_role() = 'staff_agent'
+        AND lead_id IN (
+          SELECT id FROM leads WHERE assigned_agent_id = (SELECT id FROM users WHERE supabase_uid = auth.uid()::text)
+        )
+      )
+    )
+  );
+
+-- 6. BOOKINGS POLICIES
+ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Tenant-scoped bookings select" ON bookings;
+CREATE POLICY "Tenant-scoped bookings select" ON bookings
+  FOR SELECT
+  USING (company_id = get_auth_user_company_id());
+
+DROP POLICY IF EXISTS "Tenant-scoped bookings mutate" ON bookings;
+CREATE POLICY "Tenant-scoped bookings mutate" ON bookings
+  FOR ALL
+  USING (
+    company_id = get_auth_user_company_id()
+    AND (
+      get_auth_user_role() = 'admin'
+      OR (
+        get_auth_user_role() = 'staff_agent'
+        AND lead_id IN (
+          SELECT id FROM leads WHERE assigned_agent_id = (SELECT id FROM users WHERE supabase_uid = auth.uid()::text)
+        )
+      )
+    )
+  );
+

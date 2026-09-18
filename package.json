@@ -7,13 +7,16 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:phase1": "npx tsx scripts/run-phase1-tests.ts"
+    "test:phase1": "npx tsx scripts/run-phase1-tests.ts",
+    "test:phase2": "npx tsx scripts/run-phase2-tests.ts"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
+    "@types/pdfkit": "^0.17.6",
     "next": "^15.1.7",
+    "pdfkit": "^0.20.2",
     "prisma": "5.22.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

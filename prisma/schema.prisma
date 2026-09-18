@@ -21,9 +21,12 @@ model Company {
   updatedAt DateTime @updatedAt @map("updated_at")
 
   // Relations
-  users     User[]
-  leads     Lead[]
-  leadNotes LeadNote[]
+  users          User[]
+  leads          Lead[]
+  leadNotes      LeadNote[]
+  itineraries    Itinerary[]
+  bookings       Booking[]
+  auditLogs      AuditLog[]
 
   @@map("companies")
 }
@@ -41,9 +44,10 @@ model User {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  assignedLeads Lead[]     @relation("AssignedAgent")
+  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignedLeads Lead[]        @relation("AssignedAgent")
   leadNotes     LeadNote[]
+  ledgerEntries LedgerEntry[]
 
   @@index([companyId])
   @@index([supabaseUid])
@@ -61,6 +65,20 @@ enum LeadStatus {
   IN_PROGRESS
   CONFIRMED
   MISSED
+}
+
+enum LineItemCategory {
+  ACCOMMODATION
+  TRANSPORT
+  ACTIVITY
+  MEALS
+  OTHER
+}
+
+enum BookingStatus {
+  CONFIRMED
+  CANCELLED
+  COMPLETED
 }
 
 model Lead {
@@ -83,6 +101,8 @@ model Lead {
   company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   assignedAgent User?      @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
   notes         LeadNote[]
+  itinerary     Itinerary?
+  booking       Booking?
 
   @@index([companyId])
   @@index([companyId, status])
@@ -106,4 +126,186 @@ model LeadNote {
   @@index([leadId])
   @@index([companyId])
   @@map("lead_notes")
+}
+
+model Itinerary {
+  id          String    @id @default(cuid())
+  companyId   String    @map("company_id")
+  leadId      String    @unique @map("lead_id")
+  title       String
+  destination String
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  markup      Float     @default(0)
+  totalCost   Float     @default(0) @map("total_cost")
+  finalPrice  Float     @default(0) @map("final_price")
+  currency    String    @default("INR")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  company Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead    Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  days    ItineraryDay[]
+  booking Booking?
+
+  @@index([companyId])
+  @@map("itineraries")
+}
+
+model ItineraryDay {
+  id          String   @id @default(cuid())
+  itineraryId String   @map("itinerary_id")
+  dayNumber   Int      @map("day_number")
+  title       String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  itinerary Itinerary          @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  lineItems ItineraryLineItem[]
+
+  @@index([itineraryId])
+  @@map("itinerary_days")
+}
+
+model ItineraryLineItem {
+  id          String           @id @default(cuid())
+  dayId       String           @map("day_id")
+  category    LineItemCategory
+  description String
+  cost        Float            @default(0)
+  createdAt   DateTime         @default(now()) @map("created_at")
+  updatedAt   DateTime         @updatedAt @map("updated_at")
+
+  // Relations
+  day ItineraryDay @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  @@index([dayId])
+  @@map("itinerary_line_items")
+}
+
+model Booking {
+  id            String        @id @default(cuid())
+  companyId     String        @map("company_id")
+  leadId        String        @unique @map("lead_id")
+  itineraryId   String        @unique @map("itinerary_id")
+  bookingNumber String        @unique @map("booking_number")
+  status        BookingStatus @default(CONFIRMED)
+  totalAmount   Float         @map("total_amount")
+  currency      String        @default("INR")
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  company        Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  lead           Lead           @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  itinerary      Itinerary      @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  ledgerEntries  LedgerEntry[]
+  invoices       Invoice[]
+  razorpayOrders RazorpayOrder[]
+
+  @@index([companyId])
+  @@map("bookings")
+}
+
+// ── Phase 3: Financial Ledger ─────────────────────────────────────────────────
+
+enum LedgerEntryType {
+  DEPOSIT
+  PAYMENT
+  SUPPLIER_COST
+  REFUND
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+}
+
+// Every financial transaction for a booking — multi-currency, append-only
+model LedgerEntry {
+  id           String          @id @default(cuid())
+  bookingId    String          @map("booking_id")
+  companyId    String          @map("company_id")
+  type         LedgerEntryType
+  amount       Float
+  currency     String          @default("INR")
+  description  String
+  recordedById String          @map("recorded_by_id")
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  // Relations
+  booking    Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  recordedBy User    @relation(fields: [recordedById], references: [id])
+
+  @@index([bookingId])
+  @@index([companyId])
+  @@map("ledger_entries")
+}
+
+// Append-only audit trail — never updated or deleted, per security.md §9
+model AuditLog {
+  id          String   @id @default(cuid())
+  companyId   String   @map("company_id")
+  actorId     String   @map("actor_id")
+  actorRole   String   @map("actor_role")
+  action      String   // e.g. "ledger.create", "invoice.generate"
+  entityType  String   @map("entity_type") // e.g. "LedgerEntry", "Invoice"
+  entityId    String   @map("entity_id")
+  beforeState String?  @map("before_state") // JSON string
+  afterState  String   @map("after_state")  // JSON string
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  // Relations
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([entityId])
+  @@map("audit_logs")
+}
+
+// GST-compliant invoice linked to a booking
+model Invoice {
+  id            String        @id @default(cuid())
+  bookingId     String        @map("booking_id")
+  companyId     String        @map("company_id")
+  invoiceNumber String        @unique @map("invoice_number")
+  gstNumber     String?       @map("gst_number")
+  subtotal      Float
+  gstAmount     Float         @map("gst_amount")
+  totalAmount   Float         @map("total_amount")
+  currency      String        @default("INR")
+  status        InvoiceStatus @default(DRAFT)
+  createdAt     DateTime      @default(now()) @map("created_at")
+  updatedAt     DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([companyId])
+  @@map("invoices")
+}
+
+// Tracks Razorpay gateway orders for idempotent webhook processing
+model RazorpayOrder {
+  id              String   @id @default(cuid())
+  bookingId       String   @map("booking_id")
+  companyId       String   @map("company_id")
+  razorpayOrderId String   @unique @map("razorpay_order_id")
+  razorpayPaymentId String? @map("razorpay_payment_id")
+  amount          Float
+  currency        String   @default("INR")
+  status          String   @default("CREATED") // CREATED | PAID | FAILED
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+
+  @@index([bookingId])
+  @@index([companyId])
+  @@map("razorpay_orders")
 }
