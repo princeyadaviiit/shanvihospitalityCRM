@@ -1,0 +1,53 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Multi-tenant: each company is a separate tenant
+model Company {
+  id        String   @id @default(cuid())
+  name      String
+  gstNumber String?  @map("gst_number")
+  currency  String   @default("INR") // Default currency: INR or USD
+  logoUrl   String?  @map("logo_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  users     User[]
+
+  @@map("companies")
+}
+
+// Application user linked to Supabase Auth
+model User {
+  id          String   @id @default(cuid())
+  supabaseUid String   @unique @map("supabase_uid") // Links to Supabase Auth user
+  companyId   String   @map("company_id")
+  name        String
+  email       String
+  role        UserRole
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([supabaseUid])
+  @@map("users")
+}
+
+enum UserRole {
+  admin
+  staff_agent
+  accounts
+}
