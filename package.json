@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test:phase1": "npx tsx scripts/run-phase1-tests.ts"
   },
   "dependencies": {
     "@prisma/client": "5.22.0",

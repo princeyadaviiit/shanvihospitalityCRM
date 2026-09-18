@@ -22,6 +22,8 @@ model Company {
 
   // Relations
   users     User[]
+  leads     Lead[]
+  leadNotes LeadNote[]
 
   @@map("companies")
 }
@@ -39,7 +41,9 @@ model User {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   // Relations
-  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignedLeads Lead[]     @relation("AssignedAgent")
+  leadNotes     LeadNote[]
 
   @@index([companyId])
   @@index([supabaseUid])
@@ -50,4 +54,56 @@ enum UserRole {
   admin
   staff_agent
   accounts
+}
+
+enum LeadStatus {
+  ENQUIRY
+  IN_PROGRESS
+  CONFIRMED
+  MISSED
+}
+
+model Lead {
+  id              String     @id @default(cuid())
+  companyId       String     @map("company_id")
+  name            String
+  email           String?
+  phone           String
+  destination     String
+  paxCount        Int        @default(1) @map("pax_count")
+  status          LeadStatus @default(ENQUIRY)
+  quotedPrice     Float      @default(0) @map("quoted_price")
+  currency        String     @default("INR")
+  source          String     @default("manual")
+  assignedAgentId String?    @map("assigned_agent_id")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+
+  // Relations
+  company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  assignedAgent User?      @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  notes         LeadNote[]
+
+  @@index([companyId])
+  @@index([companyId, status])
+  @@index([companyId, assignedAgentId])
+  @@map("leads")
+}
+
+model LeadNote {
+  id        String   @id @default(cuid())
+  leadId    String   @map("lead_id")
+  userId    String   @map("user_id")
+  companyId String   @map("company_id")
+  content   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  lead    Lead    @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@index([companyId])
+  @@map("lead_notes")
 }

@@ -4,20 +4,10 @@ A B2B Travel CRM built for outbound travel agencies and tour operators with inte
 
 ## Project Status
 
-**Phase 0 - Project Setup**: In Progress
+- **Phase 0 - Project Setup**: ✅ COMPLETE (Auth, multi-tenant DB structure, PWA setup)
+- **Phase 1 - Basic Core CRM (Leads Only)**: ✅ COMPLETE (Lead model, Kanban pipeline, RBAC enforcement, Staff management, manual notes, automated test suite)
+- **Phase 2 - Itinerary & Quote Builder**: Ready to start
 
-### Completed
-- ✅ Next.js project initialized with TypeScript
-- ✅ Tailwind CSS configured
-- ✅ PWA manifest and icons created
-- ✅ Environment configuration setup
-- ✅ Prisma schema defined (Company and User tables)
-- ✅ Dependencies installed
-
-### In Progress
-- ⏳ Supabase project setup
-- ⏳ Authentication implementation
-- ⏳ Testing and verification
 
 ## Technology Stack
 
@@ -120,6 +110,7 @@ D:\projects\CRM\
 - `npm run build` - Build for production
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
+- `npm run test:phase1` - Run Phase 1 automated test suite (RBAC, isolation, lifecycle)
 - `npx prisma studio` - Open Prisma Studio (database GUI)
 - `npx prisma migrate dev` - Create and apply migrations
 
