@@ -48,6 +48,8 @@ model User {
   assignedLeads Lead[]        @relation("AssignedAgent")
   leadNotes     LeadNote[]
   ledgerEntries LedgerEntry[]
+  calls         Call[]
+  targets       Target[]
 
   @@index([companyId])
   @@index([supabaseUid])
@@ -103,6 +105,7 @@ model Lead {
   notes         LeadNote[]
   itinerary     Itinerary?
   booking       Booking?
+  calls         Call[]
 
   @@index([companyId])
   @@index([companyId, status])
@@ -308,4 +311,47 @@ model RazorpayOrder {
   @@index([bookingId])
   @@index([companyId])
   @@map("razorpay_orders")
+}
+
+// ── Phase 4: Telephony & Performance Tracking ─────────────────────────────────
+
+// Call log — click-to-call metadata
+model Call {
+  id           String   @id @default(cuid())
+  companyId    String   @map("company_id")
+  leadId       String   @map("lead_id")
+  agentId      String   @map("agent_id")
+  duration     Int?     @default(0) // Duration in seconds
+  recordingUrl String?  @map("recording_url")
+  twilioCallSid String? @unique @map("twilio_call_sid")
+  status       String?  @default("initiated") // initiated | in-progress | completed | failed
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  // Relations
+  lead  Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  agent User @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([leadId])
+  @@index([agentId])
+  @@map("calls")
+}
+
+// Monthly performance targets per agent
+model Target {
+  id            String   @id @default(cuid())
+  companyId     String   @map("company_id")
+  agentId       String   @map("agent_id")
+  month         DateTime // First day of target month
+  revenueTarget Float    @default(0) @map("revenue_target")
+  bookingTarget Int      @default(0) @map("booking_target")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  agent User @relation(fields: [agentId], references: [id], onDelete: Cascade)
+
+  @@unique([agentId, month])
+  @@index([companyId])
+  @@map("targets")
 }

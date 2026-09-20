@@ -6,7 +6,10 @@ A B2B Travel CRM built for outbound travel agencies and tour operators with inte
 
 - **Phase 0 - Project Setup**: ✅ COMPLETE (Auth, multi-tenant DB structure, PWA setup)
 - **Phase 1 - Basic Core CRM (Leads Only)**: ✅ COMPLETE (Lead model, Kanban pipeline, RBAC enforcement, Staff management, manual notes, automated test suite)
-- **Phase 2 - Itinerary & Quote Builder**: Ready to start
+- **Phase 2 - Itinerary & Quote Builder**: ✅ COMPLETE (Itinerary builder, auto-costing, PDF export, booking conversion, automated test suite)
+- **Phase 3 - Payments & Ledger (Sandbox)**: ✅ COMPLETE (Razorpay integration, ledger management, GST invoices, audit logging)
+- **Phase 4 - Click-to-Call & Leaderboard**: ✅ COMPLETE (Twilio integration, call logging, performance tracking, target management)
+- **Phase 5 - Calendar, Reports & WhatsApp**: Ready to start
 
 
 ## Technology Stack

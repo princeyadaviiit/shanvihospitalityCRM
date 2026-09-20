@@ -111,3 +111,25 @@ export async function authenticateRequest(
     },
   };
 }
+
+/**
+ * Simplified helper that throws on auth failure instead of returning NextResponse.
+ * Use this in API routes where you want automatic error handling.
+ */
+export async function getAuthenticatedUser(
+  request?: NextRequest,
+  allowedRoles?: UserRole[]
+): Promise<AuthContext['user'] & { companyId: string; role: UserRole }> {
+  const result = await authenticateRequest(request, allowedRoles);
+
+  if (!result.success) {
+    const errorMessage = result.response.headers.get('x-error-message') || 'Unauthorized';
+    throw new Error(errorMessage);
+  }
+
+  return {
+    ...result.context.user,
+    companyId: result.context.companyId,
+    role: result.context.role,
+  };
+}

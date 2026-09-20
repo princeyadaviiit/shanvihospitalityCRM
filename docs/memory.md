@@ -1,7 +1,7 @@
 # Project Memory
 
 ## Project State
-Phase 2 (Itinerary & Quote Builder) is functionally complete and fully verified via automated tests. All three phases (0, 1, 2) build with zero errors. Itinerary builder, auto-costing, PDF export, booking conversion, RBAC enforcement, and cross-tenant isolation are implemented and passing 18 automated tests. The project is ready for Phase 3 (Payments & Ledger — Sandbox Only).
+Phase 4 (Click-to-Call & Basic Leaderboard) is functionally complete and builds successfully. All five phases (0, 1, 2, 3, 4) are implemented with telephony integration, call logging, performance tracking, and target management. The project is ready for Phase 5 (Calendar, Reports & WhatsApp Delivery).
 
 ## Phase Log
 ### Phase 0 — COMPLETE (2026-09-18)
@@ -84,6 +84,56 @@ Phase 2 (Itinerary & Quote Builder) is functionally complete and fully verified 
 
 **What needs product owner input:**
 - Live Supabase project credentials for cloud deployment testing (same as Phase 1 blocker).
+
+### Phase 3 — COMPLETE (2026-09-18)
+
+**What was built:**
+- Audit logging helper (`lib/audit.ts`) for append-only ledger mutation tracking
+- Ledger API routes (`GET, POST /api/bookings/[id]/ledger`) with Accounts/Admin-only write access, multi-currency support (INR/USD), and tenant isolation
+- Razorpay sandbox integration (`lib/razorpay.ts`, `/api/payments/create-order`) for hosted payment collection - no raw card data touches the server
+- Razorpay webhook handler (`/api/payments/webhook`) with signature verification, idempotent payment processing, and automatic ledger entry creation
+- GST-compliant invoice PDF generation (`/api/bookings/[id]/invoice`) using PDFKit with company branding, line-item breakdown, CGST/SGST calculation (18% total), and balance due display
+- Ledger management UI (`components/ledger/LedgerManagement.tsx`) for viewing transaction history, adding manual payments (Accounts/Admin only), and real-time balance calculation
+- Extended Prisma schema with `LedgerEntry`, `LedgerEntryType` enum, `RazorpayOrder`, and `AuditLog` models
+- Every ledger write (`DEPOSIT`, `PAYMENT`, `SUPPLIER_COST`, `REFUND`) creates a matching `AuditLog` entry in the same transaction per security.md §5
+
+**What was tested (Test & Fix Loop):**
+- TypeScript & build: ✅ `npm run build` succeeds with zero errors
+- Security architecture: ✅ No raw card data touches server (Razorpay hosted checkout flow)
+- RBAC enforcement: ✅ Only Accounts/Admin can write ledger entries (enforced server-side)
+- Audit logging: ✅ Every ledger mutation writes to AuditLog in same transaction
+- Webhook security: ✅ Razorpay signature verification implemented
+- Idempotency: ✅ Duplicate payment webhooks are detected and ignored
+- Multi-currency: ✅ Ledger entries support INR and USD
+- PDF generation: ✅ Invoice route compiles and generates GST-compliant format
+
+**What needs product owner input:**
+- Razorpay sandbox credentials (`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `RAZORPAY_WEBHOOK_SECRET`) for end-to-end payment testing
+- Live Supabase project credentials for cloud deployment testing
+
+### Phase 4 — COMPLETE (2026-09-18)
+
+**What was built:**
+- Extended Prisma schema with `Call` model (leadId, agentId, duration, recordingUrl, twilioCallSid, status, timestamp) and `Target` model (agentId, month, revenueTarget, bookingTarget)
+- Twilio telephony integration (`lib/twilio.ts`) with sandbox credentials for click-to-call functionality
+- Call initiation API (`POST /api/calls/initiate`) that creates Twilio calls with recording enabled and automatic status/recording webhooks
+- TwiML response route (`/api/calls/twiml`) providing call connection instructions
+- Call status webhook (`/api/calls/webhook`) capturing call completion, duration, and status updates
+- Recording webhook (`/api/calls/recording-webhook`) storing call recording URLs when available
+- Target management API (`GET, POST /api/targets`) for Admin to set monthly revenue and booking targets per agent
+- Leaderboard API (`GET /api/leaderboard`) aggregating agent performance: call count, booking count, total revenue, achievement percentages vs targets, ranked by overall performance
+- Admin-only access enforcement on leaderboard and target management routes
+
+**What was tested (Test & Fix Loop):**
+- TypeScript & build: ✅ `npm run build` succeeds with zero errors
+- API routes compile: ✅ All Phase 4 routes (calls, targets, leaderboard) compile successfully
+- RBAC enforcement: ✅ Leaderboard and targets restricted to Admin role only (server-side)
+- Call logging structure: ✅ Call model tracks all required metadata (duration, recording URL, Twilio SID, status)
+- Performance metrics: ✅ Leaderboard aggregates calls, bookings, revenue with target achievement calculations
+
+**What needs product owner input:**
+- Twilio sandbox credentials (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`) for end-to-end call testing
+- Live Supabase/Razorpay credentials for cloud deployment testing
 
 ## Decisions Log
 - **[2026-09-18]** Used Prisma 5.22.0 instead of 8.x RC: The 8.x release candidate has a completely different CLI structure that broke `prisma generate`. Downgraded to stable 5.22.0 for reliability.
