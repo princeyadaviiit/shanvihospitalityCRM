@@ -331,7 +331,7 @@ export async function runPhase2Tests() {
 
     const contentType = exportRes.headers.get('content-type');
     assert(
-      contentType?.includes('application/pdf'),
+      Boolean(contentType?.includes('application/pdf')),
       'PDF export returns Content-Type: application/pdf',
       `Got: ${contentType}`
     );

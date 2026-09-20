@@ -66,10 +66,10 @@ export async function GET(request: NextRequest) {
     ]);
 
     const totalLeads = leads.length;
-    const enquiries = leads.filter((l) => l.status === 'ENQUIRY').length;
-    const inProgress = leads.filter((l) => l.status === 'IN_PROGRESS').length;
-    const confirmed = leads.filter((l) => l.status === 'CONFIRMED').length;
-    const missed = leads.filter((l) => l.status === 'MISSED').length;
+    const enquiries = leads.filter((l: any) => l.status === 'ENQUIRY').length;
+    const inProgress = leads.filter((l: any) => l.status === 'IN_PROGRESS').length;
+    const confirmed = leads.filter((l: any) => l.status === 'CONFIRMED').length;
+    const missed = leads.filter((l: any) => l.status === 'MISSED').length;
 
     const totalBookings = bookings.length;
     const totalRevenue = bookings.reduce((sum: number, b: any) => sum + b.totalAmount, 0);
@@ -77,7 +77,7 @@ export async function GET(request: NextRequest) {
     const conversionRate = totalLeads > 0 ? (confirmed / totalLeads) * 100 : 0;
 
     const byAgent: Record<string, any> = {};
-    leads.forEach((lead) => {
+    leads.forEach((lead: any) => {
       if (!lead.assignedAgent) return;
       const agentName = lead.assignedAgent.name;
       if (!byAgent[agentName]) {
