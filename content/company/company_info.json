@@ -1,0 +1,28 @@
+{
+  "company": {
+    "name": "Shanvi Hospitality",
+    "tagline": "Best Tour Packages In India",
+    "type": "Travel Agency & Destination Management Company (DMC)",
+    "legal_status": "Partnership Firm",
+    "established": "2022",
+    "gst_number": "09AEKFS1932F1ZX",
+    "gst_registration_date": "27-04-2022",
+    "annual_turnover": "40L - 1.5 Cr",
+    "website": "https://shanvihospitality.in",
+    "primary_phone": "+91 9999885087",
+    "secondary_phone": "+91 9355141058",
+    "whatsapp": "+91 9999885087",
+    "email": "enquiry@shanvihospitality.in",
+    "address": {
+      "area": "Sector 18",
+      "city": "Noida",
+      "district": "Gautam Buddha Nagar",
+      "state": "Uttar Pradesh",
+      "country": "India"
+    },
+    "presence": ["Delhi/NCR", "Uttarakhand", "Madhya Pradesh", "Gujarat", "Nepal"],
+    "key_contact": "Himani Ma'am (Tour Planner)",
+    "categories": ["Travel Agency", "Tour Operator", "Destination Management Company"],
+    "markets_served": ["Domestic Travelers", "International Travelers", "Corporate Clients", "Groups & Incentives"]
+  }
+}

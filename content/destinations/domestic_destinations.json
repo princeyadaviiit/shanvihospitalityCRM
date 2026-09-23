@@ -1,0 +1,130 @@
+{
+  "domestic_destinations": [
+    {
+      "state": "Uttarakhand",
+      "description": "Nestled in North India, renowned for hills, wildlife, and spiritual sites. The crown jewel of Shanvi Hospitality's domestic packages.",
+      "cities": [
+        {
+          "name": "Haridwar",
+          "type": "Pilgrimage",
+          "highlights": ["Har Ki Pauri", "Ganga Aarti", "Mansa Devi Temple", "Chamunda Devi Temple"]
+        },
+        {
+          "name": "Rishikesh",
+          "type": "Adventure + Spiritual",
+          "highlights": ["River Rafting", "Trekking", "Yoga & Meditation", "Laxman Jhula"]
+        },
+        {
+          "name": "Jim Corbett National Park",
+          "type": "Wildlife",
+          "highlights": ["Tiger Safari", "Leopard Spotting", "Elephant Viewing", "Bird Watching", "Wildlife Photography"]
+        },
+        {
+          "name": "Nainital",
+          "type": "Hill Station",
+          "highlights": ["Naini Lake (boat ride)", "Naini Peak", "Mall Road", "Hanumangarhi Temple", "Bhimtal Lake", "Naukuchai Tal", "Sat Tal Lake"]
+        },
+        {
+          "name": "Mussoorie",
+          "type": "Hill Station",
+          "highlights": ["Kempty Waterfall", "Laltibba viewpoint", "Mall Road", "Company Garden"]
+        },
+        {
+          "name": "Mukteshwar",
+          "type": "Hill Station + Spiritual",
+          "highlights": ["Mukteshwar Mahadev Temple", "Mukteshwar Dham", "Chauli Ki Jali", "Himalayan Views"]
+        },
+        {
+          "name": "Badrinath",
+          "type": "Pilgrimage (Chardham)",
+          "highlights": ["Badrinath Temple", "Tapt Kund", "Brahma Kapal", "Valley of Flowers nearby"]
+        },
+        {
+          "name": "Kedarnath",
+          "type": "Pilgrimage (Chardham)",
+          "highlights": ["Kedarnath Temple", "Vasuki Tal Trek", "Chorabari Glacier"]
+        },
+        {
+          "name": "Gangotri",
+          "type": "Pilgrimage (Chardham)",
+          "highlights": ["Gangotri Temple", "Source of Ganga River", "Surya Kund"]
+        },
+        {
+          "name": "Yamunotri",
+          "type": "Pilgrimage (Chardham)",
+          "highlights": ["Yamunotri Temple", "Janki Chatti Trek", "Divya Shila"]
+        }
+      ]
+    },
+    {
+      "state": "Delhi",
+      "description": "India's capital — a city of historic monuments, vibrant culture, and world-class food.",
+      "cities": [
+        {
+          "name": "New Delhi",
+          "type": "Heritage + Culture",
+          "highlights": ["India Gate", "Qutub Minar", "Lotus Temple", "Jama Masjid", "President's House (Rashtrapati Bhavan)", "Chandni Chowk", "Janpath Market", "Humayun's Tomb"]
+        }
+      ]
+    },
+    {
+      "state": "Uttar Pradesh",
+      "description": "Land of the Taj Mahal, Mughal heritage, and the sacred Ganges.",
+      "cities": [
+        {
+          "name": "Agra",
+          "type": "Heritage + UNESCO",
+          "highlights": ["Taj Mahal", "Agra Red Fort", "Sikandra (Akbar's Tomb)", "Itmad-ud-daula", "Fatehpur Sikri"]
+        }
+      ]
+    },
+    {
+      "state": "Rajasthan",
+      "description": "The Land of Kings — majestic forts, vibrant culture, and golden deserts.",
+      "cities": [
+        {
+          "name": "Jaipur",
+          "type": "Heritage + Culture",
+          "highlights": ["Hawa Mahal", "Amber Fort", "City Palace", "Jantar Mantar"]
+        }
+      ]
+    },
+    {
+      "state": "Himachal Pradesh",
+      "description": "Snow-capped peaks, apple orchards, and colonial hill stations.",
+      "cities": [
+        {
+          "name": "Shimla",
+          "type": "Hill Station",
+          "highlights": ["The Ridge", "Mall Road", "Jakhu Temple", "Kufri"]
+        },
+        {
+          "name": "Manali",
+          "type": "Adventure + Hill Station",
+          "highlights": ["Rohtang Pass", "Solang Valley", "Hadimba Temple", "Old Manali"]
+        }
+      ]
+    },
+    {
+      "state": "Kerala",
+      "description": "God's Own Country — backwaters, beaches, spice gardens, and Ayurveda.",
+      "cities": [
+        {
+          "name": "Alleppey (Alappuzha)",
+          "type": "Backwaters",
+          "highlights": ["Houseboat Stay", "Backwater Cruise", "Vembanad Lake"]
+        },
+        {
+          "name": "Munnar",
+          "type": "Hill Station + Nature",
+          "highlights": ["Tea Plantations", "Eravikulam National Park", "Mattupetty Dam"]
+        },
+        {
+          "name": "Thekkady",
+          "type": "Wildlife + Spice",
+          "highlights": ["Periyar Wildlife Sanctuary", "Spice Plantation Tours", "Elephant Rides"]
+        }
+      ]
+    }
+  ]
+}

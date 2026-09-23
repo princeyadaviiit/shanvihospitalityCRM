@@ -1,12 +1,19 @@
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getSupabaseEnv } from './env';
 
 export async function createClient() {
   const cookieStore = await cookies();
 
+  const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseEnv();
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error('Supabase configuration missing: Supabase URL and Anon Key must be configured in environment variables');
+  }
+
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {

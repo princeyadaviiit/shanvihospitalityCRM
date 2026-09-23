@@ -3,6 +3,7 @@ import { z } from 'zod';
 import { authenticateRequest } from '@/lib/auth/session';
 import { prisma } from '@/lib/prisma';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { getSupabaseEnv } from '@/lib/supabase/env';
 
 const createStaffSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -67,8 +68,7 @@ export async function POST(request: NextRequest) {
     let supabaseUid = `auth_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
     // If Supabase service role key is configured, invite via Supabase Auth admin API
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+    const { url: supabaseUrl, serviceRoleKey } = getSupabaseEnv();
 
     if (
       supabaseUrl &&

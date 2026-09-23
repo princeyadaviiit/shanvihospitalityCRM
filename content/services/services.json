@@ -1,0 +1,68 @@
+{
+  "services": [
+    {
+      "id": "srv_001",
+      "name": "Customized Tour Packages",
+      "icon_suggestion": "map-pin",
+      "short_description": "Tailor-made holidays designed around your interests, budget, and travel style.",
+      "long_description": "Whether you're a solo backpacker, a honeymooning couple, or a family of ten — we craft tour packages that match exactly what you're looking for. Tell us your dream destination, your dates, and your budget. We'll handle everything else.",
+      "sub_services": ["Domestic Tour Packages", "International Tour Packages", "Honeymoon Packages", "Family Tours", "Group Tours", "Budget Travel Packages", "Luxury Travel Packages"]
+    },
+    {
+      "id": "srv_002",
+      "name": "Hotel Booking",
+      "icon_suggestion": "building",
+      "short_description": "Best rates at handpicked hotels across India and internationally.",
+      "long_description": "With our strong network of hotel partners across India and abroad, we secure the best rates without compromising on quality. From budget stays to 5-star luxury resorts — we've got the right room for you.",
+      "sub_services": ["Budget Hotels", "3-Star Hotels", "4-Star Hotels", "5-Star Hotels", "Resort Bookings", "Service Apartments"]
+    },
+    {
+      "id": "srv_003",
+      "name": "Transportation & Cab Services",
+      "icon_suggestion": "car",
+      "short_description": "Private, comfortable, and reliable transport for every journey.",
+      "long_description": "We provide a variety of vehicle types for rent — from sedans and SUVs to tempo travellers and buses. All our vehicles are air-conditioned, well-maintained, and driven by experienced, licensed drivers.",
+      "sub_services": ["Airport Transfers", "Intercity Cab Services", "Outstation Cabs", "Local Sightseeing Cabs", "Tempo Travellers", "Bus Rentals"]
+    },
+    {
+      "id": "srv_004",
+      "name": "Corporate Travel & MICE",
+      "icon_suggestion": "briefcase",
+      "short_description": "End-to-end corporate travel solutions, retreats, and event management.",
+      "long_description": "From corporate offsites to large-scale conferences and incentive travel programs, Shanvi Hospitality handles every detail. We manage logistics, accommodation, activities, and on-ground support so your team can focus on what matters.",
+      "sub_services": ["Corporate Offsite Meetings", "Conferences & Seminars", "Incentive Travel Programs", "Training Programs", "Education Groups", "Team Building Activities"]
+    },
+    {
+      "id": "srv_005",
+      "name": "Flight Booking",
+      "icon_suggestion": "plane",
+      "short_description": "Affordable domestic and international flight bookings.",
+      "long_description": "Get the best airfares for your travel dates. We search across airlines to find you the most cost-effective flight options, whether you're flying within India or heading abroad.",
+      "sub_services": ["Domestic Flight Bookings", "International Flight Bookings"]
+    },
+    {
+      "id": "srv_006",
+      "name": "Visa Assistance",
+      "icon_suggestion": "file-text",
+      "short_description": "Hassle-free visa documentation support for international travel.",
+      "long_description": "Planning to travel abroad? We guide you through the visa application process — from document preparation to submission — ensuring your application is complete and submitted correctly.",
+      "sub_services": ["Tourist Visa", "Business Visa", "Document Assistance", "Visa Consultation"]
+    },
+    {
+      "id": "srv_007",
+      "name": "Travel Guide Services",
+      "icon_suggestion": "user",
+      "short_description": "Expert local guides to enrich your travel experience.",
+      "long_description": "Explore destinations with knowledgeable, friendly local guides who bring history, culture, and stories to life. Available for sightseeing tours across major destinations in India.",
+      "sub_services": ["English-speaking Guides", "Local Language Guides", "Heritage Walk Guides", "Wildlife Naturalists"]
+    },
+    {
+      "id": "srv_008",
+      "name": "Service Apartments",
+      "icon_suggestion": "home",
+      "short_description": "Comfortable fully-furnished service apartments for extended stays.",
+      "long_description": "Ideal for long-term business travelers or families who prefer the comfort of a home while traveling. We arrange fully-furnished service apartments in major cities across India.",
+      "sub_services": ["Short-term Stays", "Long-term Stays", "Corporate Apartments"]
+    }
+  ]
+}

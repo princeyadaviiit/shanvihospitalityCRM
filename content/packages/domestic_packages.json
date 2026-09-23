@@ -1,0 +1,162 @@
+{
+  "domestic_packages": [
+    {
+      "id": "pkg_001",
+      "title": "Haridwar Corbett Nainital Tour Package",
+      "slug": "haridwar-corbett-nainital-tour-package-6days-5nights",
+      "destination": "Uttarakhand",
+      "duration": "6 Days / 5 Nights",
+      "category": ["Wildlife", "Pilgrimage", "Hill Station"],
+      "highlights": [
+        "Sacred Ganga River at Har Ki Pauri in Haridwar",
+        "Evening Ganga Aarti at Harki Pauri",
+        "Jim Corbett National Park — wildlife safaris (morning & evening)",
+        "Naini Peak and Naini Lake boat ride",
+        "Hanumangarhi Temple, Bhimtal Lake, Naukuchai Tal, Sat Tal Lake",
+        "Mall Road stroll and shopping in Nainital",
+        "River rafting and trekking opportunities at Corbett"
+      ],
+      "itinerary": [
+        {
+          "day": 1,
+          "title": "Arrival in Delhi → Haridwar",
+          "description": "Upon arrival in Delhi, depart for Haridwar. Check into hotel and relax. Visit temples including Mansa Devi and Chamunda Devi. In the evening, witness the Ganga Aarti at Har Ki Pauri. Overnight stay in Haridwar."
+        },
+        {
+          "day": 2,
+          "title": "Haridwar → Jim Corbett (200 km)",
+          "description": "After breakfast, check out from hotel and depart for Jim Corbett. If time permits, experience river rafting and trekking activities. Overnight stay in Corbett."
+        },
+        {
+          "day": 3,
+          "title": "Jim Corbett National Park Safaris",
+          "description": "Early morning jungle safari with experienced naturalist. Evening safari as well. Overnight in Corbett."
+        },
+        {
+          "day": 4,
+          "title": "Corbett → Nainital (70 km)",
+          "description": "After breakfast, depart for Nainital. Check into hotel. Explore the area. Evening stroll along Mall Road with shopping. Overnight in Nainital."
+        },
+        {
+          "day": 5,
+          "title": "Nainital Sightseeing",
+          "description": "Visit Naini Peak, boat ride on Naini Lake, Hanumangarhi Temple, Bhimtal Lake, Naukuchai Tal, and Sat Tal Lake. Evening leisure or Mall Road. Overnight in Nainital."
+        },
+        {
+          "day": 6,
+          "title": "Nainital → Delhi (Departure)",
+          "description": "After breakfast, check out and drive back to Delhi. Transfer to airport or railway station for onward journey."
+        }
+      ],
+      "inclusions": [
+        "Accommodation on double sharing basis in standard category rooms",
+        "Breakfast and dinner at all hotels",
+        "Pick-up from Delhi airport/railway station/hotel",
+        "Drop-off at Delhi airport/railway station/hotel",
+        "All transfers and sightseeing by private air-conditioned car",
+        "Fuel, toll taxes, road taxes, driver's allowance included",
+        "All applicable hotel taxes and service taxes"
+      ],
+      "exclusions": [
+        "Meals other than those specified in itinerary",
+        "Hotel upgrades due to force majeure",
+        "Airfare, train fare, visa fees, medical insurance",
+        "Entrance fees to monuments and camera fees",
+        "Personal expenses (porterage, laundry, telephone, shopping, alcohol, mineral water)",
+        "River rafting fees (if opted)"
+      ]
+    },
+    {
+      "id": "pkg_002",
+      "title": "Chardham Yatra Tour Package",
+      "slug": "chardham-yatra-tour-package",
+      "destination": "Uttarakhand",
+      "duration": "Custom (10-14 Days)",
+      "category": ["Pilgrimage", "Spiritual"],
+      "highlights": [
+        "Yamunotri — first of the four sacred shrines",
+        "Gangotri — source of the holy River Ganga",
+        "Kedarnath — ancient Shiva temple in the Himalayas",
+        "Badrinath — sacred Vishnu shrine",
+        "Spectacular Himalayan vistas throughout"
+      ],
+      "description": "Experience a profoundly spiritual journey covering the four holy shrines of Uttarakhand — Yamunotri, Gangotri, Kedarnath, and Badrinath. Our Chardham Yatra packages provide a perfect blend of spirituality, devotion, and breathtaking mountain scenery."
+    },
+    {
+      "id": "pkg_003",
+      "title": "Mussoorie Nainital Hill Station Tour",
+      "slug": "mussoorie-nainital-hill-station-tour",
+      "destination": "Uttarakhand",
+      "duration": "5 Days / 4 Nights",
+      "category": ["Hill Station", "Leisure", "Honeymoon"],
+      "highlights": [
+        "Kempty Waterfall — soothing retreat amidst nature",
+        "Laltibba — panoramic views of surrounding mountains",
+        "Naini Lake boat ride",
+        "Mall Road shopping",
+        "Misty hills and scenic lakes"
+      ],
+      "description": "Nainital and Mussoorie travel deals provide the enchanting beauty of misty hills and scenic lakes with cool mountain air. Perfect for couples, families, and solo travelers seeking a relaxing getaway."
+    },
+    {
+      "id": "pkg_004",
+      "title": "Jim Corbett Wildlife Safari Tour",
+      "slug": "jim-corbett-wildlife-safari-tour",
+      "destination": "Uttarakhand",
+      "duration": "3 Days / 2 Nights",
+      "category": ["Wildlife", "Adventure", "Photography"],
+      "highlights": [
+        "Tiger spotting in dense forests",
+        "Exotic wildlife photography opportunities",
+        "Experienced naturalist-guided safaris",
+        "Morning and evening safari sessions"
+      ],
+      "description": "Experience memorable moments in the wild at Jim Corbett National Park — North India's most famous wildlife destination. Spot tigers, leopards, elephants, and diverse exotic wildlife in their natural habitat."
+    },
+    {
+      "id": "pkg_005",
+      "title": "Mukteshwar & Kumaon Hills Tour",
+      "slug": "mukteshwar-kumaon-hills-tour",
+      "destination": "Uttarakhand",
+      "duration": "4 Days / 3 Nights",
+      "category": ["Hill Station", "Spiritual", "Nature"],
+      "highlights": [
+        "Mukteshwar Mahadev Temple",
+        "Mukteshwar Dham",
+        "Chauli Ki Jali — sacred scenic spot",
+        "Panoramic Himalayan views",
+        "Mystical spiritual ambiance"
+      ],
+      "description": "Discover the spiritual charm of Mukteshwar with visits to the Mukteshwar Mahadev Temple and immerse in the divine atmosphere of the Kumaon hills."
+    },
+    {
+      "id": "pkg_006",
+      "title": "Golden Triangle Tour — Delhi Agra Jaipur",
+      "slug": "golden-triangle-tour-delhi-agra-jaipur",
+      "destination": "Rajasthan / Delhi / UP",
+      "duration": "5 Days / 4 Nights",
+      "category": ["Heritage", "Cultural", "Popular"],
+      "highlights": [
+        "Delhi: India Gate, Qutub Minar, Lotus Temple, Jama Masjid, President's House, Chandni Chowk, Janpath",
+        "Agra: Taj Mahal, Red Fort, Sikandra, Itmad-ud-daula, Fatehpur Sikri",
+        "Jaipur: Hawa Mahal and other landmarks"
+      ],
+      "description": "India's most iconic travel circuit. Explore the grandeur of the Mughal Empire and the splendor of Rajasthan royalty in one seamlessly planned tour."
+    },
+    {
+      "id": "pkg_007",
+      "title": "Haridwar Rishikesh Spiritual Tour",
+      "slug": "haridwar-rishikesh-spiritual-tour",
+      "destination": "Uttarakhand",
+      "duration": "3 Days / 2 Nights",
+      "category": ["Pilgrimage", "Adventure", "Yoga"],
+      "highlights": [
+        "Ganga Aarti at Har Ki Pauri",
+        "River rafting in Rishikesh",
+        "Temple visits",
+        "Yoga and meditation (optional)"
+      ],
+      "description": "Explore the holy towns of Haridwar and Rishikesh — where peaceful Ganga Aarti and thrilling river rafting await. Perfect for spiritual seekers and adventure lovers alike."
+    }
+  ]
+}

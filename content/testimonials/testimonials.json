@@ -1,0 +1,58 @@
+{
+  "testimonials": [
+    {
+      "id": "t001",
+      "rating": 5,
+      "trip": "Uttarakhand Tour",
+      "text": "Thank you, Shanvi Hospitality, for an amazing trip to Uttarakhand! The arrangements were flawless, and we loved the nice hotels and excellent transport. We are definitely planning to book with you for all our future travels. Highly recommended!",
+      "highlights": ["Flawless arrangements", "Nice hotels", "Excellent transport"]
+    },
+    {
+      "id": "t002",
+      "rating": 5,
+      "trip": "Phuket, Pattaya & Bangkok — 7 Days",
+      "text": "I recently booked a 7-day Phuket, Pattaya, and Bangkok package with Shanvi Hospitality for just INR 30K. The resorts in all three cities were amazing, offering exceptional hospitality, ambiance, and food. Airport transfers were timely and efficient. The team at Shanvi Hospitality was always available to assist whenever needed.",
+      "highlights": ["Value for money", "Amazing resorts", "Timely transfers", "24/7 support"]
+    },
+    {
+      "id": "t003",
+      "rating": 5,
+      "trip": "Phuket + Phi Phi Island + Krabi — 8 Days",
+      "text": "I just completed an 8-day trip with my family arranged by Shanvi Hospitality. We stayed in Phuket for 3 nights, Phi Phi Island for 2 nights, and Krabi for 2 nights. The team at Shanvi Hospitality was incredibly helpful in customizing our vacation just the way we wanted. We explored James Bond Island, Phi Phi Island, and the Four Islands by speedboat. The hotels were great, especially considering our budget. The entire trip cost 25K INR, including all ferry rides and airport transfers. Thank you for arranging such a beautiful trip for us.",
+      "highlights": ["Family trip", "Fully customized", "Budget-friendly", "James Bond Island", "Speedboat tours"]
+    },
+    {
+      "id": "t004",
+      "rating": 5,
+      "trip": "Phuket Tour",
+      "text": "I recently had an incredible tour of Phuket organized by Shanvi Hospitality, and I couldn't be more impressed with their service. Shanvi Hospitality made the planning process effortless, providing detailed itineraries and personalized recommendations that perfectly matched our interests. Their attention to detail ensured that every aspect of the trip was well-organized and hassle-free. In Phuket, we enjoyed a variety of activities, each thoughtfully planned and exceeding our expectations. Overall, Shanvi Hospitality did an outstanding job in setting up a memorable tour of Phuket.",
+      "highlights": ["Detailed itineraries", "Personalized recommendations", "Attention to detail", "Hassle-free"]
+    },
+    {
+      "id": "t005",
+      "rating": 5,
+      "trip": "General Review",
+      "text": "I found the service and response of Shanvi Hospitality to be excellent. Easily 5 stars! The arrangements were top-notch, and Himani Ma'am made my trip truly memorable by organizing everything perfectly. The services were outstanding. Shanvi Hospitality is the best travel agency I've ever used. Thank you for the best tour I've ever had!",
+      "highlights": ["Top-notch arrangements", "Himani Ma'am praised", "Best travel agency"]
+    },
+    {
+      "id": "t006",
+      "rating": 5,
+      "trip": "General Review",
+      "text": "Thanks sir, it was a wonderful trip for us. The arrangement was amazing. We are planning to book your tour and travel for all our future trips.",
+      "highlights": ["Wonderful trip", "Amazing arrangement", "Repeat customer intent"]
+    }
+  ],
+  "aggregate": {
+    "average_rating": 5.0,
+    "total_reviews_shown": 6,
+    "key_praise_themes": [
+      "Value for money",
+      "Responsive team",
+      "Customized packages",
+      "Timely transfers",
+      "Hotel quality",
+      "Himani Ma'am (key team member)"
+    ]
+  }
+}

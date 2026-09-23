@@ -1,0 +1,104 @@
+{
+  "international_packages": [
+    {
+      "id": "intl_001",
+      "title": "Phuket Pattaya Bangkok Tour Package",
+      "slug": "phuket-pattaya-bangkok-7-days",
+      "country": "Thailand",
+      "duration": "7 Days / 6 Nights",
+      "price_from": "INR 30,000 per person",
+      "category": ["Beach", "City", "Budget", "Popular"],
+      "cities": ["Phuket", "Pattaya", "Bangkok"],
+      "highlights": [
+        "Amazing resorts in all three cities",
+        "Exceptional hospitality, ambiance, and food",
+        "Timely and efficient airport transfers",
+        "24/7 team availability for assistance",
+        "Beach activities and nightlife"
+      ],
+      "description": "One of our most popular international packages! Experience the best of Thailand across three incredible cities. Enjoy stunning beach resorts in Phuket, exciting entertainment in Pattaya, and the vibrant city life of Bangkok. All at an unbeatable value starting from just INR 30,000.",
+      "customer_review": {
+        "text": "I recently booked a 7-day Phuket, Pattaya, and Bangkok package with Shanvi Hospitality for just INR 30K. The resorts in all three cities were amazing, offering exceptional hospitality, ambiance, and food. Airport transfers were timely and efficient. The team was always available to assist whenever needed.",
+        "rating": 5
+      }
+    },
+    {
+      "id": "intl_002",
+      "title": "Phuket Phi Phi Island Krabi Family Tour",
+      "slug": "phuket-phi-phi-krabi-8-days-family",
+      "country": "Thailand",
+      "duration": "8 Days / 7 Nights",
+      "price_from": "INR 25,000 per person",
+      "category": ["Family", "Island", "Beach", "Budget"],
+      "cities": ["Phuket", "Phi Phi Island", "Krabi"],
+      "nights_breakdown": {
+        "Phuket": 3,
+        "Phi Phi Island": 2,
+        "Krabi": 2
+      },
+      "highlights": [
+        "James Bond Island exploration",
+        "Phi Phi Island tour by speedboat",
+        "Four Islands tour by speedboat",
+        "Ferry rides included",
+        "Airport transfers included",
+        "Budget-friendly hotels"
+      ],
+      "description": "A fully customizable 8-day family tour covering three of Thailand's most beautiful island destinations. From the iconic James Bond Island to the turquoise waters of Phi Phi Island and the stunning limestone cliffs of Krabi — an unforgettable Thai adventure for the whole family.",
+      "customer_review": {
+        "text": "I just completed an 8-day trip with my family arranged by Shanvi Hospitality. Stayed in Phuket for 3 nights, Phi Phi Island for 2 nights, and Krabi for 2 nights. The team was incredibly helpful in customizing our vacation just the way we wanted. The entire trip cost 25K INR, including all ferry rides and airport transfers.",
+        "rating": 5
+      }
+    },
+    {
+      "id": "intl_003",
+      "title": "Vietnam Discovery Tour",
+      "slug": "vietnam-discovery-tour-package",
+      "country": "Vietnam",
+      "duration": "7 Days / 6 Nights",
+      "category": ["Cultural", "Adventure", "Heritage", "Nature"],
+      "cities": ["Hanoi", "Halong Bay", "Hoi An", "Da Nang", "Ho Chi Minh City"],
+      "highlights": [
+        "Hanoi city exploration",
+        "Halong Bay — granite cliffs by cruise",
+        "Hoi An's lantern-lit ancient streets",
+        "My Son Sanctuary — ancient ruins",
+        "Da Nang coastal beauty",
+        "Mekong Delta floating markets",
+        "Sapa terraced rice fields",
+        "Cu Chi Tunnels historical visit"
+      ],
+      "description": "Explore the wonders of Southeast Asia with our exclusive Vietnam tours, combining stunning landscapes, rich culture, and modern style. From the lively cities of Hanoi and Ho Chi Minh City to the stunning Halong Bay, every destination promises unforgettable experiences.",
+      "packages_available": [
+        {
+          "type": "Da Nang Weekend Escape",
+          "duration": "3 Days / 2 Nights",
+          "includes": ["Da Nang", "Hoi An", "Marble Mountains"]
+        },
+        {
+          "type": "Full Vietnam Experience",
+          "duration": "7 Days / 6 Nights",
+          "includes": ["Hanoi", "Halong Bay", "Da Nang", "Hoi An", "Ho Chi Minh City"]
+        }
+      ]
+    },
+    {
+      "id": "intl_004",
+      "title": "Nepal Tour Package",
+      "slug": "nepal-tour-package",
+      "country": "Nepal",
+      "duration": "5 Days / 4 Nights",
+      "category": ["Spiritual", "Adventure", "Trekking", "Heritage"],
+      "cities": ["Kathmandu", "Pokhara", "Chitwan"],
+      "highlights": [
+        "Pashupatinath Temple",
+        "Boudhanath Stupa",
+        "Swayambhunath (Monkey Temple)",
+        "Pokhara and Phewa Lake",
+        "Himalayan views",
+        "Chitwan National Park safari"
+      ],
+      "description": "Shanvi Hospitality specializes in Nepal tours as a focused Destination Management Company in Nepal. Explore spiritual Kathmandu, serene Pokhara, and the wildlife-rich Chitwan in this perfectly curated Nepal package."
+    }
+  ]
+}

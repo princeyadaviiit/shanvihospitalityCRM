@@ -1,0 +1,92 @@
+{
+  "international_destinations": [
+    {
+      "country": "Thailand",
+      "description": "Southeast Asia's crown jewel — stunning beaches, vibrant nightlife, ancient temples, and world-class cuisine. Shanvi Hospitality's most-booked international destination.",
+      "cities": [
+        {
+          "name": "Phuket",
+          "type": "Beach + Resort",
+          "highlights": ["Patong Beach", "Big Buddha", "Old Phuket Town", "Phang Nga Bay", "Island hopping"]
+        },
+        {
+          "name": "Pattaya",
+          "type": "Entertainment + Beach",
+          "highlights": ["Walking Street", "Coral Island", "Alcazar Cabaret Show", "Nong Nooch Tropical Garden"]
+        },
+        {
+          "name": "Bangkok",
+          "type": "City + Culture",
+          "highlights": ["Grand Palace", "Wat Pho", "Chatuchak Market", "Khao San Road", "Chao Phraya River Cruise"]
+        },
+        {
+          "name": "Phi Phi Island",
+          "type": "Island + Beach",
+          "highlights": ["Maya Bay (The Beach)", "Snorkeling", "Speed boat tours", "Crystal clear waters"]
+        },
+        {
+          "name": "Krabi",
+          "type": "Island + Adventure",
+          "highlights": ["Railay Beach", "Four Islands tour", "Rock climbing", "Limestone caves", "Kayaking"]
+        }
+      ]
+    },
+    {
+      "country": "Vietnam",
+      "description": "A land of breathtaking natural beauty, rich history, and vibrant street culture.",
+      "cities": [
+        {
+          "name": "Hanoi",
+          "type": "Capital + Culture",
+          "highlights": ["Hoan Kiem Lake", "Old Quarter", "Temple of Literature", "Ho Chi Minh Mausoleum"]
+        },
+        {
+          "name": "Halong Bay",
+          "type": "Nature + UNESCO",
+          "highlights": ["Limestone karsts and islets", "Overnight cruise", "Kayaking", "Cave exploration"]
+        },
+        {
+          "name": "Da Nang",
+          "type": "Beach + City",
+          "highlights": ["My Khe Beach", "Dragon Bridge", "Marble Mountains", "Ba Na Hills"]
+        },
+        {
+          "name": "Hoi An",
+          "type": "Heritage + Culture",
+          "highlights": ["Ancient Town (UNESCO)", "Lantern Festival", "Tailoring shops", "Old Japanese Bridge"]
+        },
+        {
+          "name": "Ho Chi Minh City",
+          "type": "City + History",
+          "highlights": ["Cu Chi Tunnels", "War Remnants Museum", "Ben Thanh Market", "Notre-Dame Cathedral"]
+        },
+        {
+          "name": "Sapa",
+          "type": "Nature + Trekking",
+          "highlights": ["Terraced rice fields", "Fansipan Peak (highest in Vietnam)", "Hill tribe villages"]
+        }
+      ]
+    },
+    {
+      "country": "Nepal",
+      "description": "Home of the Himalayas — a land of unparalleled natural beauty, ancient temples, and spiritual energy. Shanvi Hospitality is a focused DMC in Nepal.",
+      "cities": [
+        {
+          "name": "Kathmandu",
+          "type": "Spiritual + Heritage",
+          "highlights": ["Pashupatinath Temple", "Boudhanath Stupa", "Swayambhunath (Monkey Temple)", "Durbar Square", "Thamel Market"]
+        },
+        {
+          "name": "Pokhara",
+          "type": "Adventure + Nature",
+          "highlights": ["Phewa Lake", "Sarangkot sunrise view", "Peace Pagoda", "Paragliding", "Annapurna Base Camp trek access"]
+        },
+        {
+          "name": "Chitwan",
+          "type": "Wildlife",
+          "highlights": ["Chitwan National Park", "Rhino safari", "Elephant breeding center", "Jungle walk", "Canoe ride"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "contact": {
+    "primary_phone": "+91 9999885087",
+    "secondary_phone": "+91 9355141058",
+    "whatsapp": "+91 9999885087",
+    "email": "enquiry@shanvihospitality.in",
+    "website": "https://shanvihospitality.in",
+    "support": "24/7 available",
+    "office": {
+      "area": "Sector 18",
+      "city": "Noida",
+      "state": "Uttar Pradesh",
+      "country": "India",
+      "full_address": "Sector 18, Noida, Gautam Buddha Nagar, Uttar Pradesh, India"
+    },
+    "social_media": {
+      "note": "Developer should add social media links from actual profiles. LinkedIn profile exists under 'Shanvi Hospitality' / 'shanvhospitalitydmc'."
+    },
+    "business_hours": {
+      "weekdays": "9:00 AM – 7:00 PM",
+      "saturday": "10:00 AM – 5:00 PM",
+      "sunday": "On Call / WhatsApp",
+      "note": "24/7 WhatsApp support available"
+    },
+    "cta_buttons": [
+      {
+        "label": "WhatsApp Us",
+        "type": "whatsapp",
+        "number": "+919999885087",
+        "link": "https://wa.me/919999885087"
+      },
+      {
+        "label": "Call Now",
+        "type": "phone",
+        "number": "+91 9999885087"
+      },
+      {
+        "label": "Email Us",
+        "type": "email",
+        "address": "enquiry@shanvihospitality.in"
+      }
+    ]
+  }
+}
