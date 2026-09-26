@@ -203,6 +203,35 @@ CRM/
 
 ---
 
+## 📱 Android Mobile Application (Capacitor)
+
+The CRM is bundled as an Android mobile app using **Capacitor**, complete with:
+- **Native Safe-Area Margins (`pt-safe`, `pb-safe`)**: Prevents UI clipping behind camera notches, status bars, and home gesture pill.
+- **Custom CRM App Icon & Splash Screen**: Generated luxury gold/amber and dark obsidian emblem across all Android screen densities (`mdpi`, `hdpi`, `xhdpi`, `xxhdpi`, `xxxhdpi`).
+- **Dark Status Bar Integration**: Seamless `#020617` background integration matching native Android themes.
+
+### How to Run on Android
+
+1. **Sync Assets to Android Project**:
+   ```bash
+   npm run cap:sync
+   ```
+
+2. **Open in Android Studio**:
+   ```bash
+   npm run cap:open
+   ```
+   *(Or open the `android/` directory in Android Studio).*
+
+3. **Run on Device or Emulator**:
+   - In Android Studio, connect your Android device (with USB Debugging enabled) or start an emulator.
+   - Click the green **"Run"** button (`Shift + F10`) to build and launch the APK.
+
+4. **Connecting to Production or Local Server**:
+   - In [`capacitor.config.ts`](./capacitor.config.ts), set `server.url` to your live Vercel/Netlify URL (e.g. `https://your-crm.vercel.app`) or your local Wi-Fi IP (e.g. `http://192.168.1.X:3000`) for development.
+
+---
+
 ## 🏢 Company Information
 
 - **Company**: Shanvi Hospitality

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Shanvi CRM</string>
+    <string name="title_activity_main">Shanvi CRM</string>
+    <string name="package_name">com.shanvihospitality.crm</string>
+    <string name="custom_url_scheme">com.shanvihospitality.crm</string>
+</resources>

@@ -60,7 +60,7 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Header & Navigation */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md">
+      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md pt-safe">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-18 items-center">
             {/* Brand Identity */}
@@ -272,7 +272,7 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-safe">
         {activeTab === 'dashboard' && (
           <ExecutiveOverview
             userRole={user.role}

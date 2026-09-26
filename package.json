@@ -11,10 +11,16 @@
     "test:phase1": "npx tsx scripts/run-phase1-tests.ts",
     "test:phase2": "npx tsx scripts/run-phase2-tests.ts",
     "test:phase5": "npx tsx scripts/run-phase5-tests.ts",
-    "test:phase6": "npx tsx scripts/run-phase6-tests.ts",
-    "test:all": "npm run test:phase1 && npm run test:phase2 && npm run test:phase5 && npm run test:phase6"
+    "test:all": "npm run test:phase1 && npm run test:phase2 && npm run test:phase5 && npm run test:phase6",
+    "cap:sync": "cap sync android",
+    "cap:open": "cap open android"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/app": "^8.1.1",
+    "@capacitor/core": "^8.5.2",
+    "@capacitor/splash-screen": "^8.0.2",
+    "@capacitor/status-bar": "^8.0.3",
     "@prisma/client": "5.22.0",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.116.0",
@@ -37,6 +43,7 @@
     "zod": "3.23.8"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "eslint": "^8",
     "eslint-config-next": "^15.1.7"
   }
