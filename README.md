@@ -63,7 +63,7 @@ Go to **Site configuration → Environment variables** in Netlify, and add the f
 
 | Variable | Value / Description | Example |
 |---|---|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL | `https://kfjaziakfrassvzxrxck.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL | `https://xyzcompany.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase Anon Public Key | `eyJhbGciOi...` |
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres` |
 | `NEXT_PUBLIC_APP_URL` | Your Netlify site URL | `https://your-site-name.netlify.app` |

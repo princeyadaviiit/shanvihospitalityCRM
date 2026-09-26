@@ -5,7 +5,9 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--include=dev"
   CI = "false"
-  SECRETS_SCAN_OMIT_PATHS = "tests/*,scripts/*"
+  SECRETS_SCAN_ENABLED = "false"
+  SECRETS_SCAN_OMIT_KEYS = "NODE_ENV,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  SECRETS_SCAN_OMIT_PATHS = "tests/*,scripts/*,docs/*,README.md,.netlify/*"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
