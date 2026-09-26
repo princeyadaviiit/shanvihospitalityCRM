@@ -1,4 +1,4 @@
-﻿-- CreateEnum
+-- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('admin', 'staff_agent', 'accounts');
 
 -- CreateEnum
@@ -389,4 +389,83 @@ ALTER TABLE "calls" ADD CONSTRAINT "calls_agent_id_fkey" FOREIGN KEY ("agent_id"
 
 -- AddForeignKey
 ALTER TABLE "targets" ADD CONSTRAINT "targets_agent_id_fkey" FOREIGN KEY ("agent_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- ── HRMS & Employee Payroll Tables ──────────────────────────────────────────
+
+CREATE TABLE "employees" (
+    "id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "department" TEXT NOT NULL,
+    "designation" TEXT NOT NULL,
+    "joining_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "base_salary" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "allowances" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "deductions" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "net_salary" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "bank_name" TEXT,
+    "account_number" TEXT,
+    "ifsc_code" TEXT,
+    "pan_number" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'ACTIVE',
+    "commission_rate" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "employees_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "salary_payments" (
+    "id" TEXT NOT NULL,
+    "employee_id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "month" TEXT NOT NULL,
+    "base_amount" DOUBLE PRECISION NOT NULL,
+    "bonus_amount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "deductions" DOUBLE PRECISION NOT NULL DEFAULT 0,
+    "net_paid" DOUBLE PRECISION NOT NULL,
+    "payment_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "payment_mode" TEXT NOT NULL DEFAULT 'NEFT',
+    "payment_status" TEXT NOT NULL DEFAULT 'PAID',
+    "transaction_ref" TEXT,
+    "notes" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "salary_payments_pkey" PRIMARY KEY ("id")
+);
+
+CREATE TABLE "custom_packages" (
+    "id" TEXT NOT NULL,
+    "company_id" TEXT NOT NULL,
+    "title" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
+    "destination" TEXT NOT NULL,
+    "country" TEXT NOT NULL DEFAULT 'India',
+    "duration" TEXT NOT NULL,
+    "days_count" INTEGER NOT NULL DEFAULT 1,
+    "price_from" TEXT,
+    "category" TEXT NOT NULL,
+    "highlights" TEXT NOT NULL,
+    "description" TEXT NOT NULL,
+    "itinerary" TEXT,
+    "inclusions" TEXT,
+    "exclusions" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "custom_packages_pkey" PRIMARY KEY ("id")
+);
+
+CREATE INDEX "employees_company_id_idx" ON "employees"("company_id");
+CREATE INDEX "salary_payments_company_id_idx" ON "salary_payments"("company_id");
+CREATE INDEX "salary_payments_employee_id_idx" ON "salary_payments"("employee_id");
+CREATE INDEX "custom_packages_company_id_idx" ON "custom_packages"("company_id");
+
+ALTER TABLE "employees" ADD CONSTRAINT "employees_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "salary_payments" ADD CONSTRAINT "salary_payments_employee_id_fkey" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "salary_payments" ADD CONSTRAINT "salary_payments_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "custom_packages" ADD CONSTRAINT "custom_packages_company_id_fkey" FOREIGN KEY ("company_id") REFERENCES "companies"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 

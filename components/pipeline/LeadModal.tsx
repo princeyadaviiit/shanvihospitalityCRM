@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { SHANVI_PACKAGES } from '@/lib/packages-data';
 
 type UserOption = {
   id: string;
@@ -15,6 +16,7 @@ type LeadModalProps = {
   onLeadCreated: () => void;
   userRole: 'admin' | 'staff_agent' | 'accounts';
   staffList?: UserOption[];
+  prefillDestination?: string;
 };
 
 export default function LeadModal({
@@ -23,20 +25,35 @@ export default function LeadModal({
   onLeadCreated,
   userRole,
   staffList = [],
+  prefillDestination = '',
 }: LeadModalProps) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
-  const [destination, setDestination] = useState('');
+  const [destination, setDestination] = useState(prefillDestination);
+  const [selectedPackageId, setSelectedPackageId] = useState('');
   const [paxCount, setPaxCount] = useState(2);
   const [quotedPrice, setQuotedPrice] = useState(0);
   const [currency, setCurrency] = useState('INR');
-  const [source, setSource] = useState('manual');
+  const [source, setSource] = useState('website');
   const [assignedAgentId, setAssignedAgentId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  function handlePackageChange(pkgId: string) {
+    setSelectedPackageId(pkgId);
+    if (!pkgId) return;
+    const pkg = SHANVI_PACKAGES.find((p) => p.id === pkgId);
+    if (pkg) {
+      setDestination(`${pkg.destination} — ${pkg.title}`);
+      if (pkg.priceFrom) {
+        const num = Number(pkg.priceFrom.replace(/[^0-9]/g, ''));
+        if (num) setQuotedPrice(num * paxCount);
+      }
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -117,6 +134,37 @@ export default function LeadModal({
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Quick Package Selector */}
+          <div className="p-3.5 rounded-2xl bg-orange-50/60 border border-orange-200/80">
+            <label className="block text-2xs font-extrabold uppercase tracking-wider text-orange-900 mb-1">
+              📦 Select Shanvi Tour Package (Optional Pre-fill)
+            </label>
+            <select
+              value={selectedPackageId}
+              onChange={(e) => handlePackageChange(e.target.value)}
+              className="w-full px-3 py-1.5 rounded-xl border border-orange-200 text-xs text-slate-800 bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 font-medium"
+            >
+              <option value="">-- Custom / Ad-hoc Enquiry --</option>
+              <optgroup label="Domestic Packages (Uttarakhand / India)">
+                {SHANVI_PACKAGES.filter((p) => p.type === 'domestic').map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.title} ({pkg.duration})
+                  </option>
+                ))}
+              </optgroup>
+              <optgroup label="International Packages (Thailand / Vietnam / Nepal)">
+                {SHANVI_PACKAGES.filter((p) => p.type === 'international').map((pkg) => (
+                  <option key={pkg.id} value={pkg.id}>
+                    {pkg.title} ({pkg.duration})
+                  </option>
+                ))}
+              </optgroup>
+            </select>
+            <span className="text-3xs text-orange-700 block mt-1">
+              Selecting a package automatically fills destination and estimated price.
+            </span>
+          </div>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-slate-600 mb-1">
@@ -218,13 +266,15 @@ export default function LeadModal({
               <select
                 value={source}
                 onChange={(e) => setSource(e.target.value)}
-                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-slate-900 bg-white"
+                className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-slate-900 bg-white"
               >
-                <option value="manual">Manual Entry</option>
-                <option value="website">Website Enquiry</option>
-                <option value="whatsapp">WhatsApp Inbound</option>
-                <option value="referral">Client Referral</option>
-                <option value="ads">Meta / Google Ads</option>
+                <option value="website">Shanvi Website Form</option>
+                <option value="whatsapp">WhatsApp (+91 9999885087)</option>
+                <option value="phone">Direct Phone Call</option>
+                <option value="walkin">Walk-in (Noida HQ)</option>
+                <option value="referral">Client Referral / Repeat</option>
+                <option value="corporate">Corporate Travel & MICE</option>
+                <option value="manual">Manual Agent Entry</option>
               </select>
             </div>
 
@@ -236,7 +286,7 @@ export default function LeadModal({
                 <select
                   value={assignedAgentId}
                   onChange={(e) => setAssignedAgentId(e.target.value)}
-                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm text-slate-900 bg-white"
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm text-slate-900 bg-white"
                 >
                   <option value="">Unassigned (Open Lead)</option>
                   {staffList
@@ -262,9 +312,9 @@ export default function LeadModal({
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-sm transition disabled:opacity-50"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white text-sm font-bold shadow-md shadow-orange-500/20 transition disabled:opacity-50"
             >
-              {loading ? 'Creating...' : 'Create Lead'}
+              {loading ? 'Creating...' : 'Create Lead & Add to Pipeline'}
             </button>
           </div>
         </form>

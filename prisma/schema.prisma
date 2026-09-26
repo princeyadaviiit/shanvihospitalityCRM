@@ -27,6 +27,9 @@ model Company {
   itineraries    Itinerary[]
   bookings       Booking[]
   auditLogs      AuditLog[]
+  employees      Employee[]
+  salaryPayments SalaryPayment[]
+  customPackages CustomPackage[]
 
   @@map("companies")
 }
@@ -355,3 +358,87 @@ model Target {
   @@index([companyId])
   @@map("targets")
 }
+
+// ── Phase 5: HRMS & Employee Payroll ─────────────────────────────────────────
+
+model Employee {
+  id             String          @id @default(cuid())
+  companyId      String          @map("company_id")
+  name           String
+  email          String
+  phone          String
+  department     String          // Sales, Operations, Tour Planning, Accounts, Management
+  designation    String          // e.g. "Senior Tour Consultant", "Key Tour Planner"
+  joiningDate    DateTime        @default(now()) @map("joining_date")
+  baseSalary     Float           @default(0) @map("base_salary")
+  allowances     Float           @default(0)
+  deductions     Float           @default(0)
+  netSalary      Float           @default(0) @map("net_salary")
+  bankName       String?         @map("bank_name")
+  accountNumber  String?         @map("account_number")
+  ifscCode       String?         @map("ifsc_code")
+  panNumber      String?         @map("pan_number")
+  status         String          @default("ACTIVE") // ACTIVE, ON_LEAVE, RESIGNED
+  commissionRate Float           @default(0) @map("commission_rate")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  // Relations
+  company        Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  salaryPayments SalaryPayment[]
+
+  @@index([companyId])
+  @@map("employees")
+}
+
+model SalaryPayment {
+  id             String   @id @default(cuid())
+  employeeId     String   @map("employee_id")
+  companyId      String   @map("company_id")
+  month          String   // e.g. "September 2026"
+  baseAmount     Float    @map("base_amount")
+  bonusAmount    Float    @default(0) @map("bonus_amount")
+  deductions     Float    @default(0)
+  netPaid        Float    @map("net_paid")
+  paymentDate    DateTime @default(now()) @map("payment_date")
+  paymentMode    String   @default("NEFT") // NEFT, IMPS, UPI, CHEQUE, CASH
+  paymentStatus  String   @default("PAID") // PAID, PENDING, PROCESSING
+  transactionRef String?  @map("transaction_ref")
+  notes          String?
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  // Relations
+  employee       Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([employeeId])
+  @@map("salary_payments")
+}
+
+model CustomPackage {
+  id          String   @id @default(cuid())
+  companyId   String   @map("company_id")
+  title       String
+  slug        String
+  destination String
+  country     String   @default("India")
+  duration    String
+  daysCount   Int      @default(1) @map("days_count")
+  priceFrom   String?  @map("price_from")
+  category    String   // JSON array string
+  highlights  String   // JSON array string
+  description String
+  itinerary   String?  // JSON array string
+  inclusions  String?  // JSON array string
+  exclusions  String?  // JSON array string
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@map("custom_packages")
+}
+

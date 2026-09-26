@@ -38,6 +38,9 @@ type StaffOption = {
 type KanbanBoardProps = {
   userRole: 'admin' | 'staff_agent' | 'accounts';
   currentUserId: string;
+  initialOpenCreateModal?: boolean;
+  prefillDestination?: string;
+  onModalClosed?: () => void;
 };
 
 const COLUMNS = [
@@ -71,16 +74,28 @@ const COLUMNS = [
   },
 ] as const;
 
-export default function KanbanBoard({ userRole, currentUserId }: KanbanBoardProps) {
+export default function KanbanBoard({
+  userRole,
+  currentUserId,
+  initialOpenCreateModal,
+  prefillDestination,
+  onModalClosed,
+}: KanbanBoardProps) {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [staffList, setStaffList] = useState<StaffOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedAgentId, setSelectedAgentId] = useState('');
   const [selectedLeadId, setSelectedLeadId] = useState<string | null>(null);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(initialOpenCreateModal || false);
   const [draggingLeadId, setDraggingLeadId] = useState<string | null>(null);
   const [dragOverColumn, setDragOverColumn] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (initialOpenCreateModal) {
+      setIsCreateModalOpen(true);
+    }
+  }, [initialOpenCreateModal]);
 
   // Fetch leads and staff
   async function loadData() {
@@ -324,7 +339,21 @@ export default function KanbanBoard({ userRole, currentUserId }: KanbanBoardProp
 
                         {/* Phone & Pax */}
                         <div className="text-xs text-slate-500 flex items-center justify-between mb-3">
-                          <span>{lead.phone}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span>{lead.phone}</span>
+                            <a
+                              href={`https://wa.me/${lead.phone.replace(/[^0-9]/g, '')}?text=Hello%20${encodeURIComponent(
+                                lead.name
+                              )}%2C%20greetings%20from%20Shanvi%20Hospitality!`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={(e) => e.stopPropagation()}
+                              className="px-1.5 py-0.5 rounded bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-3xs font-extrabold border border-emerald-200 transition"
+                              title="Direct WhatsApp"
+                            >
+                              💬 WA
+                            </a>
+                          </div>
                           <span className="font-medium text-slate-600">{lead.paxCount} Pax</span>
                         </div>
 
@@ -374,10 +403,14 @@ export default function KanbanBoard({ userRole, currentUserId }: KanbanBoardProp
       {/* Lead Create Modal */}
       <LeadModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          onModalClosed?.();
+        }}
         onLeadCreated={() => loadData()}
         userRole={userRole}
         staffList={staffList}
+        prefillDestination={prefillDestination}
       />
 
       {/* Lead Detail Drawer */}

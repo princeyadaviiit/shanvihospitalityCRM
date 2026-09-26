@@ -55,6 +55,14 @@ export async function GET(
         },
         orderBy: { createdAt: 'desc' },
       },
+      bookings: {
+        select: {
+          id: true,
+          bookingNumber: true,
+          totalAmount: true,
+          status: true,
+        },
+      },
     },
   });
 

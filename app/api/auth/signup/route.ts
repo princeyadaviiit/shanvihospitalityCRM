@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { prisma } from '@/lib/prisma';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const signUpSchema = z.object({
   companyName: z.string().min(1, 'Company name is required'),
@@ -11,6 +12,16 @@ const signUpSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const clientIp = getClientIp(request);
+  const rateLimit = checkRateLimit(`signup:${clientIp}`, { maxRequests: 5, windowMs: 60 * 1000 });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many registration requests from this IP. Please wait 60 seconds.' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const validatedData = signUpSchema.parse(body);

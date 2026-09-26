@@ -1,9 +1,9 @@
 // Script runner for Phase 2 automated tests
-import { runPhase2Tests } from '../tests/phase2.test';
+(process.env as any).NODE_ENV = 'test';
 
-async function main() {
-  (process.env as any).NODE_ENV = 'test';
+async function run() {
   try {
+    const { runPhase2Tests } = await import('../tests/phase2.test');
     const result = await runPhase2Tests();
     if (!result.success) {
       process.exit(1);
@@ -15,4 +15,6 @@ async function main() {
   }
 }
 
-main();
+run();
+
+export {};

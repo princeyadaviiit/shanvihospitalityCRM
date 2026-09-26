@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
+import { checkRateLimit, getClientIp } from '@/lib/rate-limit';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -8,6 +9,16 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
+  const clientIp = getClientIp(request);
+  const rateLimit = checkRateLimit(`login:${clientIp}`, { maxRequests: 8, windowMs: 60 * 1000 });
+
+  if (!rateLimit.allowed) {
+    return NextResponse.json(
+      { error: 'Too many login attempts. Please wait 60 seconds before trying again.' },
+      { status: 429 }
+    );
+  }
+
   try {
     const body = await request.json();
     const validatedData = loginSchema.parse(body);

@@ -4,12 +4,22 @@ import { createServerClient } from '@supabase/ssr';
 
 import { getSupabaseEnv } from '@/lib/supabase/env';
 
+function applySecurityHeaders(res: NextResponse): NextResponse {
+  res.headers.set('X-Frame-Options', 'DENY');
+  res.headers.set('X-Content-Type-Options', 'nosniff');
+  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
+  res.headers.set('X-XSS-Protection', '1; mode=block');
+  return res;
+}
+
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   });
+  applySecurityHeaders(response);
 
   const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseEnv();
 
@@ -34,6 +44,7 @@ export async function middleware(request: NextRequest) {
             response = NextResponse.next({
               request,
             });
+            applySecurityHeaders(response);
             cookiesToSet.forEach(({ name, value, options }) =>
               response.cookies.set(name, value, options)
             );
@@ -45,16 +56,19 @@ export async function middleware(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectRes = NextResponse.redirect(new URL('/login', request.url));
+      return applySecurityHeaders(redirectRes);
     }
 
     if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-      return NextResponse.redirect(new URL('/dashboard', request.url));
+      const redirectRes = NextResponse.redirect(new URL('/dashboard', request.url));
+      return applySecurityHeaders(redirectRes);
     }
   } catch (error) {
     console.error('Middleware auth check error:', error);
     if (request.nextUrl.pathname.startsWith('/dashboard')) {
-      return NextResponse.redirect(new URL('/login', request.url));
+      const redirectRes = NextResponse.redirect(new URL('/login', request.url));
+      return applySecurityHeaders(redirectRes);
     }
   }
 
@@ -62,5 +76,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/signup'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
 };

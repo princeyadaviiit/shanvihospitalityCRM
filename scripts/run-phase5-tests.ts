@@ -1,10 +1,10 @@
-// Script runner for Phase 1 automated tests
+// Script runner for Phase 5 automated tests
 (process.env as any).NODE_ENV = 'test';
 
 async function run() {
   try {
-    const { runPhase1Tests } = await import('../tests/phase1.test');
-    const result = await runPhase1Tests();
+    const { runPhase5Tests } = await import('../tests/phase5.test');
+    const result = await runPhase5Tests();
     if (!result.success) {
       process.exit(1);
     }

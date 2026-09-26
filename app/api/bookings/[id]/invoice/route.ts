@@ -55,13 +55,13 @@ export async function GET(
     const lead = booking.lead;
     const itinerary = booking.itinerary;
 
-    doc.fontSize(20).text(company.name, { align: 'center' });
-    doc.fontSize(10).text('TAX INVOICE', { align: 'center' });
-    doc.moveDown();
+    const companyName = company.name || 'Shanvi Hospitality';
+    const gstNumber = company.gstNumber || '09AEKFS1932F1ZX';
 
-    if (company.gstNumber) {
-      doc.fontSize(9).text(`GSTIN: ${company.gstNumber}`, { align: 'center' });
-    }
+    doc.fontSize(18).text(companyName, { align: 'center' });
+    doc.fontSize(10).text('TAX INVOICE', { align: 'center' });
+    doc.fontSize(8).text('Sector 18, Noida, Uttar Pradesh 201301 | Helpline: +91 9999885087', { align: 'center' });
+    doc.fontSize(9).text(`GSTIN: ${gstNumber}`, { align: 'center' });
     doc.moveDown();
 
     doc.fontSize(10).text(`Invoice Number: INV-${booking.bookingNumber}`);

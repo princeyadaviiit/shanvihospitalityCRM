@@ -123,8 +123,10 @@ export async function getAuthenticatedUser(
   const result = await authenticateRequest(request, allowedRoles);
 
   if (!result.success) {
-    const errorMessage = result.response.headers.get('x-error-message') || 'Unauthorized';
-    throw new Error(errorMessage);
+    if (result.response.status === 403) {
+      throw new Error('Forbidden: Insufficient permissions for this action');
+    }
+    throw new Error('Unauthorized: Authentication required');
   }
 
   return {

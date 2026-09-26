@@ -1,7 +1,7 @@
 # Project Memory
 
 ## Project State
-Phase 4 (Click-to-Call & Basic Leaderboard) is functionally complete and builds successfully. All five phases (0, 1, 2, 3, 4) are implemented with telephony integration, call logging, performance tracking, and target management. The project is ready for Phase 5 (Calendar, Reports & WhatsApp Delivery).
+Phase 5 (Calendar, Reports & WhatsApp Delivery) and Phase 6 (Hardening & Production Readiness) are functionally complete, verified, and hardened. All 63 automated tests pass across Phases 1, 2, 5, and 6. The project compiles with zero TypeScript errors and zero ESLint warnings, and all enterprise security standards (RBAC audit, in-memory sliding-window rate limiting, HTTP security headers, and cross-tenant data isolation) are fully in place.
 
 ## Phase Log
 ### Phase 0 — COMPLETE (2026-09-18)
@@ -131,11 +131,55 @@ Phase 4 (Click-to-Call & Basic Leaderboard) is functionally complete and builds 
 - Call logging structure: ✅ Call model tracks all required metadata (duration, recording URL, Twilio SID, status)
 - Performance metrics: ✅ Leaderboard aggregates calls, bookings, revenue with target achievement calculations
 
-**What needs product owner input:**
-- Twilio sandbox credentials (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`) for end-to-end call testing
-- Live Supabase/Razorpay credentials for cloud deployment testing
+### Phase 5 — COMPLETE (2026-09-23)
+
+**What was built:**
+- Tour departures calendar view API (`GET /api/calendar`) filtering confirmed bookings by departure month with guest details, pax count, and destination.
+- Executive Sales Report API (`GET /api/reports/sales`) calculating total inquiries, in-progress quotes, confirmed bookings, gross pipeline revenue, and agent conversion leaderboard.
+- PDFKit Accommodation Voucher generation (`GET /api/bookings/[id]/voucher`) with hotel booking details, room type, meal plan (MAP), guest voucher codes, and Shanvi 24/7 emergency support.
+- WhatsApp sandbox delivery integration (`POST /api/whatsapp/send`) supporting instant quotes, invoices, and vouchers via Twilio sandbox or direct `wa.me` deep link, with automatic timeline logging to the lead's notes.
+- Company settings API (`GET, PATCH /api/company`) with Admin RBAC enforcement and tenant-scoped GST credentials.
+- Interactive Tour Departures Calendar UI (`components/calendar/TourCalendarView.tsx`) with instant Accommodation Voucher download and WhatsApp voucher dispatch.
+- Executive Sales Report Modal (`components/dashboard/ExecutiveOverview.tsx`) with conversion funnel visualization, agent performance table, and print/export capabilities.
+- Lead Detail Drawer integration with one-click "WhatsApp Quote" and "Accommodation Voucher" actions upon confirmation.
+- Automated Phase 5 test suite (`tests/phase5.test.ts`, `scripts/run-phase5-tests.ts`, `npm run test:phase5`) verifying 14 test cases.
+
+**What was tested (Test & Fix Loop):**
+- Functional checks: ✅ All 14 tests pass (`npm run test:phase5`).
+- Voucher generation: ✅ Emits valid binary PDF with `%PDF-` header.
+- WhatsApp dispatch: ✅ Auto-logs timeline notes on lead and returns valid deep links.
+- Cross-tenant isolation: ✅ Non-tenant users blocked from viewing vouchers with 403 Forbidden.
+
+### Phase 6 — COMPLETE (2026-09-23)
+
+**What was built:**
+- Comprehensive RBAC audit across all API routes:
+  - Admin-only routes (`/api/staff`, `/api/targets`, `/api/leaderboard`, `/api/company`, `/api/payroll`, `/api/employees` write) strictly reject non-admin roles with 403 Forbidden.
+  - Resolved `getAuthenticatedUser` failure mapping to preserve 403 status code instead of defaulting to 401.
+  - Enforced authentication and tenant scoping across all employee and payroll routes.
+- In-memory sliding-window rate limiter (`lib/rate-limit.ts`) applied to authentication endpoints (`/api/auth/login`, `/api/auth/signup`) and `/api/whatsapp/send`.
+- Enterprise HTTP security headers applied via Next.js `middleware.ts`:
+  - `X-Frame-Options: DENY` (clickjacking defense)
+  - `X-Content-Type-Options: nosniff` (MIME sniffing defense)
+  - `Referrer-Policy: strict-origin-when-cross-origin`
+  - `Permissions-Policy: camera=(), microphone=(self), geolocation=()`
+  - `X-XSS-Protection: 1; mode=block`
+- Adversarial cross-tenant test suite verifying complete tenant isolation across leads, itineraries, bookings, and accommodation vouchers.
+- Cleaned up legacy `next-pwa` dev dependency from `package.json` to eliminate vulnerable transitive dependencies.
+- Production build validation: `npm run build` compiles all 35 routes cleanly with zero TypeScript errors and zero ESLint warnings.
+- Automated Phase 6 test suite (`tests/phase6.test.ts`, `scripts/run-phase6-tests.ts`, `npm run test:phase6`) verifying 15 test cases.
+
+**What was tested (Test & Fix Loop):**
+- Full test suite: ✅ All 63 automated tests pass across Phases 1, 2, 5, and 6 (`npm run test:all`).
+- TypeScript check: ✅ `npx tsc --noEmit` completes with zero errors.
+- ESLint check: ✅ `npm run lint` reports 0 warnings and 0 errors.
+- Production build: ✅ `npm run build` succeeds (Exit 0) generating 35 optimized routes.
 
 ## Decisions Log
+- **[2026-09-23]** RBAC Status Code Mapping: Updated `lib/auth/session.ts` to ensure `getAuthenticatedUser` throws an error containing `'Forbidden'` when `authenticateRequest` returns 403, preventing routes from erroneously treating role rejections as 401 Unauthorized.
+- **[2026-09-23]** Sliding-Window Rate Limiting: Configured in-memory rate limiter with a sliding-window algorithm and support for test bypass and test override (`forceCheck`), allowing automated suites to verify rate-limit enforcement deterministically.
+- **[2026-09-23]** Dependency Hygiene: Removed legacy `next-pwa` from `package.json` devDependencies since PWA manifest and service worker are implemented directly without next-pwa plugin, clearing legacy rollup/serialize-javascript supply chain alerts.
+
 - **[2026-09-18]** Used Prisma 5.22.0 instead of 8.x RC: The 8.x release candidate has a completely different CLI structure that broke `prisma generate`. Downgraded to stable 5.22.0 for reliability.
 - **[2026-09-18]** Used Zod 3.23.8 instead of 4.x: Zod 4.x has breaking changes (no `.errors` property). Pinned to stable 3.23.8 to avoid compatibility issues.
 - **[2026-09-18]** Simplified PWA setup: Removed next-pwa plugin due to TypeScript compatibility issues with Next.js 15. Implemented basic service worker and manifest directly, which is sufficient for Phase 0 acceptance criteria (app can be installed as PWA).

@@ -86,23 +86,26 @@ function generateItineraryPdfBuffer(data: {
       doc.on('end', () => resolve(Buffer.concat(buffers)));
       doc.on('error', (err) => reject(err));
 
-      const primaryColor = '#1d4ed8'; // Tailwind Blue 700
+      const primaryColor = '#ea580c'; // Deep Saffron / Amber
+      const navyColor = '#1b2a4a'; // Royal Navy
       const slateDark = '#0f172a';
       const slateMuted = '#475569';
       const slateLight = '#64748b';
       const borderGray = '#e2e8f0';
 
       // --- Header Banner ---
-      doc.rect(40, 40, 515, 60).fillAndStroke('#eff6ff', '#bfdbfe');
-      doc.fillColor(primaryColor).fontSize(18).font('Helvetica-Bold')
-        .text(data.companyName.toUpperCase(), 55, 52);
-      doc.fillColor(slateMuted).fontSize(10).font('Helvetica')
-        .text('CUSTOM TRAVEL PROPOSAL & ITINERARY QUOTE', 55, 74);
+      doc.rect(40, 40, 515, 66).fillAndStroke('#fff7ed', '#fed7aa');
+      doc.fillColor(primaryColor).fontSize(16).font('Helvetica-Bold')
+        .text('SHANVI HOSPITALITY', 55, 50);
+      doc.fillColor(navyColor).fontSize(8).font('Helvetica-Bold')
+        .text('DESTINATION MANAGEMENT COMPANY (DMC) • GSTIN: 09AEKFS1932F1ZX', 55, 68);
+      doc.fillColor(slateMuted).fontSize(7.5).font('Helvetica')
+        .text('Sector 18, Noida, UP • Helpline: +91 9999885087 • enquiry@shanvihospitality.in', 55, 80);
 
       doc.moveDown(2);
 
       // --- Proposal Details Box ---
-      const detailsTop = 115;
+      const detailsTop = 120;
       doc.rect(40, detailsTop, 515, 80).fillAndStroke('#f8fafc', borderGray);
 
       // Left Column
