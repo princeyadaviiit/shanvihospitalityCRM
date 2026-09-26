@@ -1,151 +1,189 @@
-# Travel CRM Platform
+# Shanvi Hospitality — Next-Gen Tour Operations & CRM Platform
 
-A B2B Travel CRM built for outbound travel agencies and tour operators with internal sales teams.
+An enterprise-grade B2B/B2C Destination Management & Travel CRM engineered for **Shanvi Hospitality** (Sector 18, Noida, Uttar Pradesh). Built with Next.js 15, React 19, TypeScript, Tailwind CSS, Supabase, and Prisma.
 
-## Project Status
+---
 
-- **Phase 0 - Project Setup**: ✅ COMPLETE (Auth, multi-tenant DB structure, PWA setup)
-- **Phase 1 - Basic Core CRM (Leads Only)**: ✅ COMPLETE (Lead model, Kanban pipeline, RBAC enforcement, Staff management, manual notes, automated test suite)
-- **Phase 2 - Itinerary & Quote Builder**: ✅ COMPLETE (Itinerary builder, auto-costing, PDF export, booking conversion, automated test suite)
-- **Phase 3 - Payments & Ledger (Sandbox)**: ✅ COMPLETE (Razorpay integration, ledger management, GST invoices, audit logging)
-- **Phase 4 - Click-to-Call & Leaderboard**: ✅ COMPLETE (Twilio integration, call logging, performance tracking, target management)
-- **Phase 5 - Calendar, Reports & WhatsApp**: Ready to start
+## 🌟 Key Platform Features
 
+### 1. 📊 Executive Dashboard & Sales Engine (Phase 5)
+- **Real-Time KPIs**: Track New Enquiries, Active Proposals, Confirmed Bookings, and Conversion Rate.
+- **Sales Target Meter**: Visual progress tracking against monthly agency revenue quotas.
+- **Detailed Sales Report**: Interactive modal displaying stage-by-stage pipeline funnels, agent conversion leaderboards, and printable executive summaries (`/api/reports/sales`).
 
-## Technology Stack
+### 2. 🗂️ Lead Pipeline & Instant Quotations
+- **HTML5 Drag-and-Drop Kanban Board**: 4 pipeline stages (`Enquiry`, `In Progress`, `Confirmed`, `Missed`).
+- **Instant WhatsApp Proposal Dispatch**: 1-click WhatsApp quote generator pre-composed with Shanvi branding via `wa.me` deep links or Twilio sandbox, auto-logging timeline notes.
+- **Custom Itinerary & Quote Builder**: Multi-day itinerary creator with line items (Hotels, Transport, Meals, Activities), auto-calculated markup, and instant PDF quote export.
 
-- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: Supabase (PostgreSQL)
-- **ORM**: Prisma
-- **Auth**: Supabase Auth
-- **Storage**: Supabase Storage
-- **Queue**: BullMQ + Redis
-- **Deployment**: Vercel (frontend), Supabase (backend services)
+### 3. 🗺️ Tour Packages & Custom Package Builder
+- **Pre-Built Packages Ingested**: Haridwar, Jim Corbett, Nainital, Mussoorie, Chardham Yatra, Mukteshwar, Golden Triangle, Phuket, Krabi, Pattaya, Vietnam, and Nepal.
+- **Custom Package Builder**: Create tailor-made packages with day-by-day itineraries, custom inclusions/exclusions, pricing tiers, and instant lead quotation.
 
-## Prerequisites
+### 4. 📅 Tour Departures Calendar & Accommodation Vouchers (Phase 5)
+- **Live Departure Tracking**: Filter confirmed guest departures and check-in logistics by month.
+- **Accommodation Voucher PDF Generation**: Generates official hotel vouchers with hotel details, room categories, meal plans (MAP), guest IDs, and Shanvi 24/7 emergency support (`+91 9999885087`).
+- **Voucher WhatsApp Dispatch**: Dispatch hotel vouchers directly to guests via WhatsApp.
 
-- Node.js 20.x or later
-- npm or yarn
-- A Supabase account and project
+### 5. 👥 HRMS & Employee Payroll Management
+- **Staff Directory**: Track employee designations, departments, contact info, sales commission rates, and status (`ACTIVE`, `ON_LEAVE`, `RESIGNED`).
+- **Compensation Breakdown**: Track Base Salary, Allowances/HRA, Statutory Deductions, and Net Take-Home Pay.
+- **Bank Remittance Credentials**: Store Bank Name, Account Number, IFSC Code, and PAN for HDFC, SBI, ICICI, PNB.
+- **Disbursement Ledger**: Record monthly salary payments with payment modes (`NEFT`, `IMPS`, `UPI`, `CHEQUE`, `CASH`) and transaction UTR references.
 
-## Installation
+### 6. 🏢 Company Hub & Interactive Office Map
+- **Corporate Credentials**: Official GSTIN (`09AEKFS1932F1ZX`) and HDFC Bank remittance details.
+- **Interactive OpenStreetMap**: Visual map centered on Sector 18 Noida (`28.5708° N, 77.3271° E`) with 1-click GPS copy and transit cards (Noida Sector 18 Metro Station Blue Line, IGI Airport, New Delhi Railway Station).
 
-1. **Clone the repository**
-   ```bash
-   cd D:\projects\CRM
-   ```
+### 7. 🛡️ Enterprise Security Hardening (Phase 6)
+- **RBAC Audit**: Role checks server-enforced on every route (`admin`, `staff_agent`, `accounts`).
+- **Sliding-Window Rate Limiting**: In-memory rate limiting on authentication and WhatsApp routes.
+- **HTTP Security Headers**: `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy`.
+- **Cross-Tenant Data Isolation**: Strict tenant scoping on all database queries.
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+---
 
-3. **Configure environment variables**
-   
-   Copy `.env.example` to `.env.local`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Then fill in your Supabase credentials:
-   - `NEXT_PUBLIC_SUPABASE_URL`: Your Supabase project URL
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-   - `DATABASE_URL`: Your Supabase Postgres connection string
+## 🚀 Netlify Deployment Guide
 
-4. **Set up the database**
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
+The repository includes a pre-configured [`netlify.toml`](./netlify.toml) designed specifically for Next.js 15 App Router and Prisma.
 
-5. **Run the development server**
-   ```bash
-   npm run dev
-   ```
+### Step 1: Import Project into Netlify
+1. Go to your [Netlify Dashboard](https://app.netlify.com/).
+2. Click **"Add new site"** → **"Import an existing project"**.
+3. Choose **GitHub** and select the repository: `princeyadaviiit/shanvihospitalityCRM`.
 
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+### Step 2: Build Configuration
+Netlify will automatically detect [`netlify.toml`](./netlify.toml) settings:
+- **Build command:** `npx prisma generate && npm run build`
+- **Publish directory:** `.next`
+- **Node version:** `20`
 
-## Project Structure
+### Step 3: Configure Environment Variables in Netlify
+Go to **Site configuration → Environment variables** in Netlify, and add the following keys:
+
+| Variable | Value / Description | Example |
+|---|---|---|
+| `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL | `https://kfjaziakfrassvzxrxck.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase Anon Public Key | `eyJhbGciOi...` |
+| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres` |
+| `NEXT_PUBLIC_APP_URL` | Your Netlify site URL | `https://your-site-name.netlify.app` |
+| `NODE_ENV` | Environment mode | `production` |
+
+> [!IMPORTANT]
+> **Password URL Encoding**: If your database password contains special characters like `@`, URL-encode it (e.g. `@energyengine007` becomes `%40energyengine007`), or use the Supabase **Connection Pooler URL** (port 6543) from Supabase Settings → Database.
+
+### Step 4: Execute Database SQL in Supabase
+Ensure all database tables are created in your Supabase project:
+1. Open your [Supabase SQL Editor](https://supabase.com/dashboard).
+2. Copy and run the contents of [`prisma/supabase_schema.sql`](./prisma/supabase_schema.sql) (or lines 393–470 for the HRMS & Custom Packages tables).
+
+### Step 5: Deploy
+Click **"Deploy site"**. Netlify will run the build, generate Prisma client bindings, and publish the application.
+
+---
+
+## 💻 Local Development
+
+### 1. Prerequisites
+- **Node.js**: `20.x` or later
+- **npm**: `10.x` or later
+
+### 2. Setup
+```bash
+# Clone the repository
+git clone https://github.com/princeyadaviiit/shanvihospitalityCRM.git
+cd shanvihospitalityCRM
+
+# Install dependencies
+npm install
+
+# Copy environment template
+cp .env.example .env
+
+# Generate Prisma Client bindings
+npx prisma generate
+
+# Start development server
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to view the application.
+
+---
+
+## 🧪 Testing & Verification
+
+The CRM includes automated test suites covering all implementation phases:
+
+```bash
+# Run all automated test suites (63 tests)
+npm run test:all
+
+# Run specific phase test suites
+npm run test:phase1    # RBAC, Leads, Notes, Tenant Isolation (16 tests)
+npm run test:phase2    # Itinerary Builder, Markup, PDF Export (18 tests)
+npm run test:phase5    # Calendar, Sales Report, Voucher PDF, WhatsApp (14 tests)
+npm run test:phase6    # RBAC Audit, Rate Limiting, Security Headers (15 tests)
+
+# TypeScript type check
+npx tsc --noEmit
+
+# ESLint check
+npm run lint
+
+# Production build verification
+npm run build
+```
+
+---
+
+## 📁 Repository Architecture
 
 ```
-D:\projects\CRM\
-├── app/                    # Next.js App Router pages
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
+CRM/
+├── app/
+│   ├── (auth)/              # Login & Signup pages
+│   ├── api/
+│   │   ├── auth/            # Rate-limited auth endpoints
+│   │   ├── bookings/        # Invoices, vouchers, ledger mutations
+│   │   ├── calendar/        # Tour departures calendar
+│   │   ├── employees/       # HRMS staff directory
+│   │   ├── itineraries/     # Itinerary builder & PDF generator
+│   │   ├── leads/           # Pipeline & manual notes
+│   │   ├── packages/        # Custom package builder
+│   │   ├── payroll/         # Salary disbursement ledger
+│   │   ├── reports/sales/   # Executive sales & conversion metrics
+│   │   ├── staff/           # Admin staff management
+│   │   └── whatsapp/send/   # Branded WhatsApp delivery
+│   └── dashboard/           # Main CRM operational shell
+├── components/
+│   ├── calendar/            # Tour departures calendar UI
+│   ├── company/             # Office location map & HDFC remittance
+│   ├── dashboard/           # Executive KPI overview & sales report modal
+│   ├── employees/           # HRMS employee directory & salary modal
+│   ├── itinerary/           # Itinerary builder modal
+│   ├── packages/            # Packages catalog & custom builder modal
+│   └── pipeline/            # Kanban board, lead modal, detail drawer
+├── content/                 # Official Shanvi tour packages & brand guides
+├── docs/                    # PRD, TRD, architecture, security, memory logs
+├── lib/
+│   ├── auth/session.ts      # Multi-tenant RBAC enforcement helper
+│   ├── mock-db.ts           # In-memory database with Shanvi fixtures
+│   ├── packages-data.ts     # Tour packages catalog & office coordinates
+│   └── rate-limit.ts        # Sliding-window rate limiter
 ├── prisma/
-│   └── schema.prisma      # Database schema
-├── public/                # Static assets
-│   ├── manifest.json      # PWA manifest
-│   └── icons/             # PWA icons
-├── docs/                  # Project documentation
-│   ├── PRD.md            # Product Requirements
-│   ├── TRD.md            # Technical Requirements
-│   ├── architecture.md    # System Architecture
-│   ├── security.md        # Security Requirements
-│   ├── auth.md           # Authentication Spec
-│   ├── phases.md         # Implementation Phases
-│   ├── rules.md          # Working Rules
-│   └── memory.md         # Project Memory Log
-└── package.json
+│   ├── schema.prisma        # Prisma relational schema
+│   └── supabase_schema.sql  # Complete PostgreSQL DDL for Supabase
+├── netlify.toml             # Netlify deployment configuration
+└── middleware.ts            # Security headers & session route protection
 ```
 
-## User Roles
+---
 
-- **Admin**: Full system access, manages team and company settings
-- **Staff Agent**: Owns assigned leads, builds itineraries, makes calls
-- **Accounts**: Manages payments, ledgers, and financial reports
+## 🏢 Company Information
 
-## Phase 0 Acceptance Criteria
-
-- [ ] User can sign up a company
-- [ ] User can log in and log out
-- [ ] App installs as a PWA
-- [ ] App runs locally without errors
-- [ ] Security check passes (no secrets committed, HTTPS in production)
-
-## Development
-
-### Commands
-
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run test:phase1` - Run Phase 1 automated test suite (RBAC, isolation, lifecycle)
-- `npx prisma studio` - Open Prisma Studio (database GUI)
-- `npx prisma migrate dev` - Create and apply migrations
-
-### Code Standards
-
-- TypeScript strict mode enabled
-- Business logic in API layer, not frontend components
-- All endpoints validate input (Zod)
-- RBAC enforced server-side on every endpoint
-- Every tenant-scoped query filtered by `company_id`
-
-## Security
-
-- HTTPS everywhere
-- Session tokens in httpOnly cookies only
-- Secrets in environment variables, never committed
-- Row Level Security (RLS) on all tenant-scoped tables
-- Input validation on all endpoints
-- Regular dependency vulnerability checks
-
-## Documentation
-
-See the `docs/` folder for complete specification:
-- **PRD.md**: Product requirements and feature scope
-- **TRD.md**: Technology stack and data model
-- **architecture.md**: System architecture
-- **security.md**: Security requirements
-- **auth.md**: Authentication and RBAC specification
-- **phases.md**: Phase-by-phase build plan
-- **rules.md**: Working rules for build agent
-- **memory.md**: Project state and decision log
-
-## License
-
-Private - All Rights Reserved
+- **Company**: Shanvi Hospitality
+- **Corporate Office**: Sector 18, Noida, Uttar Pradesh 201301
+- **GSTIN**: `09AEKFS1932F1ZX`
+- **24/7 Helpline**: `+91 9999885087`
+- **Email**: `info@shanvihospitality.in`
