@@ -125,6 +125,8 @@ export async function runPhase6Tests() {
 
     const itineraryB = await prisma.itinerary.create({
       data: {
+        title: 'Goa Holiday Experience',
+        destination: 'Goa',
         companyId: companyBId,
         leadId: leadBId,
         totalCost: 120000,
@@ -137,7 +139,7 @@ export async function runPhase6Tests() {
             description: 'Arrival at resort',
             lineItems: {
               create: [{
-                category: 'Accommodation',
+                category: 'ACCOMMODATION',
                 description: 'Luxury Suite',
                 cost: 120000,
               }],

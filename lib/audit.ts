@@ -28,7 +28,7 @@ export async function createAuditLog({
       entityType,
       entityId,
       beforeState: beforeState ? JSON.stringify(beforeState) : null,
-      afterState: afterState ? JSON.stringify(afterState) : null,
+      afterState: afterState ? JSON.stringify(afterState) : '{}',
     },
   });
 }

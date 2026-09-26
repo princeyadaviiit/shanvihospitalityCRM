@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import { mockDb } from './mock-db';
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: any;
+  prisma: PrismaClient | undefined;
 };
 
 function getPrismaInstance(): PrismaClient {
@@ -15,10 +15,12 @@ function getPrismaInstance(): PrismaClient {
   ) {
     return mockDb as unknown as PrismaClient;
   }
-  return new PrismaClient();
+  return new PrismaClient({
+    log: ['error'],
+  });
 }
 
 export const prisma = globalForPrisma.prisma ?? getPrismaInstance();
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
+globalForPrisma.prisma = prisma;
 

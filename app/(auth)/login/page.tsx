@@ -1,13 +1,23 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialErrorParam = searchParams.get('error');
+
+  let defaultError = null;
+  if (initialErrorParam === 'account_not_found') {
+    defaultError = 'Authenticated with Supabase, but no active CRM staff or admin account is linked to this email. Please register or contact your administrator.';
+  } else if (initialErrorParam === 'account_deactivated') {
+    defaultError = 'This staff account has been deactivated. Please contact your company administrator.';
+  }
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(defaultError);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -121,5 +131,13 @@ export default function LoginPage() {
         <p>Sector 18, Noida • Central Helpline: +91 9999885087</p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-slate-900" />}>
+      <LoginForm />
+    </Suspense>
   );
 }

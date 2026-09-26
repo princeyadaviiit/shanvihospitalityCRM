@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.razorpayOrder.create({
       data: {
-        orderId: order.id,
+        razorpayOrderId: order.id,
         bookingId: booking.id,
         companyId: user.companyId,
         amount: validatedData.amount,

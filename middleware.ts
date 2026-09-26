@@ -61,8 +61,11 @@ export async function middleware(request: NextRequest) {
     }
 
     if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-      const redirectRes = NextResponse.redirect(new URL('/dashboard', request.url));
-      return applySecurityHeaders(redirectRes);
+      // Do not redirect to dashboard if user arrived with an explicit error parameter (e.g. account setup pending)
+      if (!request.nextUrl.searchParams.has('error')) {
+        const redirectRes = NextResponse.redirect(new URL('/dashboard', request.url));
+        return applySecurityHeaders(redirectRes);
+      }
     }
   } catch (error) {
     console.error('Middleware auth check error:', error);

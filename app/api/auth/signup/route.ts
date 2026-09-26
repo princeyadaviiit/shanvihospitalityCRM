@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Account created successfully',
     });
-  } catch (error) {
+  } catch (error: any) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: error.errors[0].message },
@@ -78,8 +78,26 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Sign up error:', error);
+
+    // Prisma Unique Constraint Error (P2002)
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'An account or company with this credential already exists.' },
+        { status: 409 }
+      );
+    }
+
+    // Prisma Database Connection Error
+    if (error?.message?.includes("Can't reach database") || error?.message?.includes('connection') || error?.code === 'P1001') {
+      return NextResponse.json(
+        { error: 'Database connection failed. Please verify that your DATABASE_URL uses the Supabase Connection Pooler (port 6543).' },
+        { status: 503 }
+      );
+    }
+
+    const message = error instanceof Error ? error.message : 'An unexpected error occurred during registration';
     return NextResponse.json(
-      { error: 'An unexpected error occurred' },
+      { error: message },
       { status: 500 }
     );
   }

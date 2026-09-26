@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
       const currency = payment.currency;
 
       const razorpayOrder = await prisma.razorpayOrder.findUnique({
-        where: { orderId },
+        where: { razorpayOrderId: orderId },
         include: {
           booking: {
             include: {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       }
 
       const existingPayment = await prisma.razorpayOrder.findFirst({
-        where: { paymentId },
+        where: { razorpayPaymentId: paymentId },
       });
 
       if (existingPayment) {
@@ -69,9 +69,9 @@ export async function POST(request: NextRequest) {
 
       await prisma.$transaction(async (tx: any) => {
         await tx.razorpayOrder.update({
-          where: { orderId },
+          where: { razorpayOrderId: orderId },
           data: {
-            paymentId,
+            razorpayPaymentId: paymentId,
             status: 'CAPTURED',
           },
         });
@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
             amount,
             currency,
             description: `Online payment via Razorpay (${paymentId})`,
-            recordedById: razorpayOrder.booking.company.users[0]?.id || razorpayOrder.companyId,
+            recordedById: (razorpayOrder as any).booking?.company?.users?.[0]?.id || razorpayOrder.companyId,
           },
         });
 
