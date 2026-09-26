@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "prisma generate",
     "test:phase1": "npx tsx scripts/run-phase1-tests.ts",
     "test:phase2": "npx tsx scripts/run-phase2-tests.ts",
     "test:phase5": "npx tsx scripts/run-phase5-tests.ts",

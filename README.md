@@ -43,41 +43,64 @@ An enterprise-grade B2B/B2C Destination Management & Travel CRM engineered for *
 
 ---
 
-## 🚀 Netlify Deployment Guide
+## 🚀 Cloud Deployment Guides
 
-The repository includes a pre-configured [`netlify.toml`](./netlify.toml) designed specifically for Next.js 15 App Router and Prisma.
+### Option A: Vercel Deployment (Recommended for Next.js)
 
-### Step 1: Import Project into Netlify
-1. Go to your [Netlify Dashboard](https://app.netlify.com/).
-2. Click **"Add new site"** → **"Import an existing project"**.
-3. Choose **GitHub** and select the repository: `princeyadaviiit/shanvihospitalityCRM`.
+Vercel provides native, zero-configuration hosting for Next.js 15. The repository includes [`vercel.json`](./vercel.json) and `"postinstall": "prisma generate"`.
 
-### Step 2: Build Configuration
-Netlify will automatically detect [`netlify.toml`](./netlify.toml) settings:
-- **Build command:** `npx prisma generate && npm run build`
-- **Publish directory:** `.next`
-- **Node version:** `20`
+#### 1. Import into Vercel
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New..." → "Project"**.
+2. Select **GitHub** and choose `princeyadaviiit/shanvihospitalityCRM`.
+3. Vercel automatically detects Next.js framework settings.
 
-### Step 3: Configure Environment Variables in Netlify
-Go to **Site configuration → Environment variables** in Netlify, and add the following keys:
-
+#### 2. Configure Environment Variables
+Under **Environment Variables**, add:
 | Variable | Value / Description | Example |
 |---|---|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | Your Supabase Project URL | `https://xyzcompany.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Your Supabase Anon Public Key | `eyJhbGciOi...` |
-| `DATABASE_URL` | PostgreSQL connection string | `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres` |
-| `NEXT_PUBLIC_APP_URL` | Your Netlify site URL | `https://your-site-name.netlify.app` |
+| `DATABASE_URL` | Supabase Transaction Pooler URL (port 6543) | `postgresql://postgres.[ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true` |
+| `DIRECT_URL` | Supabase Direct DB URL (port 5432) | `postgresql://postgres:[password]@db.[ref].supabase.co:5432/postgres` |
+| `NEXT_PUBLIC_APP_URL` | Your Vercel production domain | `https://your-crm.vercel.app` |
 | `NODE_ENV` | Environment mode | `production` |
 
-> [!IMPORTANT]
-> **Password URL Encoding**: If your database password contains special characters like `@`, URL-encode it (e.g. `@energyengine007` becomes `%40energyengine007`), or use the Supabase **Connection Pooler URL** (port 6543) from Supabase Settings → Database.
+> [!TIP]
+> **Serverless Connection Pooling**: For Vercel serverless functions, use the Supabase **Connection Pooler URL** (port 6543 with `?pgbouncer=true`) for `DATABASE_URL` to avoid exhausting database connections.
 
-### Step 4: Execute Database SQL in Supabase
+#### 3. Click "Deploy"
+Vercel will install dependencies, automatically execute `prisma generate` via `postinstall`, run `next build`, and deploy globally with edge caching.
+
+---
+
+### Option B: Netlify Deployment
+
+The repository includes a pre-configured [`netlify.toml`](./netlify.toml) designed specifically for Next.js 15 App Router and Prisma.
+
+#### Step 1: Import Project into Netlify
+1. Go to your [Netlify Dashboard](https://app.netlify.com/).
+2. Click **"Add new site"** → **"Import an existing project"**.
+3. Choose **GitHub** and select the repository: `princeyadaviiit/shanvihospitalityCRM`.
+
+#### Step 2: Build Configuration
+Netlify will automatically detect [`netlify.toml`](./netlify.toml) settings:
+- **Build command:** `prisma generate && npm run build`
+- **Node version:** `20`
+
+#### Step 3: Configure Environment Variables in Netlify
+Go to **Site configuration → Environment variables** in Netlify, and add:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `DATABASE_URL`
+- `NEXT_PUBLIC_APP_URL`
+- `NODE_ENV` = `production`
+
+#### Step 4: Execute Database SQL in Supabase
 Ensure all database tables are created in your Supabase project:
 1. Open your [Supabase SQL Editor](https://supabase.com/dashboard).
-2. Copy and run the contents of [`prisma/supabase_schema.sql`](./prisma/supabase_schema.sql) (or lines 393–470 for the HRMS & Custom Packages tables).
+2. Copy and run the contents of [`prisma/supabase_schema.sql`](./prisma/supabase_schema.sql).
 
-### Step 5: Deploy
+#### Step 5: Deploy
 Click **"Deploy site"**. Netlify will run the build, generate Prisma client bindings, and publish the application.
 
 ---
