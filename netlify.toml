@@ -1,8 +1,10 @@
 [build]
-  command = "npx prisma generate && npm run build"
+  command = "prisma generate && npm run build"
 
 [build.environment]
   NODE_VERSION = "20"
+  NPM_FLAGS = "--include=dev"
+  CI = "false"
   SECRETS_SCAN_OMIT_PATHS = "tests/*,scripts/*"
 
 [[plugins]]

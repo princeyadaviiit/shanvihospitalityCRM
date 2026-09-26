@@ -1006,15 +1006,14 @@ class MockDatabase {
         .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
       res.notes = notes;
     }
-    if (include?.bookings) {
-      res.bookings = this.bookings
-        .filter((b) => b.leadId === l.id)
-        .map((b) => ({
-          id: b.id,
-          bookingNumber: b.bookingNumber,
-          totalAmount: b.totalAmount,
-          status: b.status,
-        }));
+    if (include?.booking || include?.bookings) {
+      const b = this.bookings.find((item) => item.leadId === l.id);
+      res.booking = b ? {
+        id: b.id,
+        bookingNumber: b.bookingNumber,
+        totalAmount: b.totalAmount,
+        status: b.status,
+      } : null;
     }
     if (include?._count?.select?.notes) {
       res._count = {

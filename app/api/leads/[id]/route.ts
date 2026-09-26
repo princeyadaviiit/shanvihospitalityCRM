@@ -55,7 +55,7 @@ export async function GET(
         },
         orderBy: { createdAt: 'desc' },
       },
-      bookings: {
+      booking: {
         select: {
           id: true,
           bookingNumber: true,
