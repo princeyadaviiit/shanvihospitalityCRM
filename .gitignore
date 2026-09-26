@@ -43,3 +43,5 @@ prisma/migrations/**/migration.sql
 *.swp
 *.swo
 *~
+.claude/
+
