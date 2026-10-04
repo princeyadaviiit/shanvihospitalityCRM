@@ -171,7 +171,7 @@ Before declaring it "fixed", verify all of these:
 ## 🆘 Still Not Working?
 
 ### Check Clerk Service Status
-Visit: https://status.cler.com
+Visit: https://status.clerk.com
 
 ### Check Browser Console Errors
 1. Open production site in browser
