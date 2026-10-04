@@ -195,5 +195,39 @@ Phase 5 (Calendar, Reports & WhatsApp Delivery) and Phase 6 (Hardening & Product
 ## Active Blockers
 - **[2026-09-18]** Waiting on: Supabase live project credentials (URL, anon key, database URL) for cloud deployment testing. (Local automated verification passes 100% across all 3 phases).
 
+## Recent Changes (2026-10-04)
+
+### Employees & Payroll Restricted to Admin-Only
+**What changed:**
+- All Employees and Payroll API routes now enforce admin-only access (`/api/employees`, `/api/employees/[id]`, `/api/payroll`)
+- Previously allowed roles (`staff_agent`, `accounts`) are now blocked with 403 Forbidden
+- UI navigation hides Employees & Payroll tabs for non-admins (both desktop and mobile)
+- Direct URL access by non-admins shows a 403 access restriction message
+- Verified no employee/payroll/salary data leaks through other endpoints (sales reports, leaderboard only show lead/booking data)
+
+**Why:**
+- Confidential HR and financial data should only be accessible to company administrators
+- Protects sensitive compensation, bank account, and payroll information from unauthorized access
+
+**Security verification:**
+- ✅ Non-admin API calls return 403 Forbidden
+- ✅ No salary/payroll data appears in sales reports or other accessible endpoints
+- ✅ UI properly hides navigation for non-admin roles
+- ✅ Tenant isolation (`companyId`) still enforced on all routes
+
+### Theme Filter Removed from Tours & Packages
+**What changed:**
+- Removed the horizontally scrolling theme chip row (Wildlife, Pilgrimage, Hill Station, etc.) from Tours & Packages
+- Removed `activeCategory` state and all related filtering logic
+- Kept Domestic/International toggle and search bar as the only filters
+- The `category` field remains in the package data model (not deleted from database)
+
+**Why:**
+- Simplified UI with fewer filter options
+- Search and Domestic/International toggle provide sufficient filtering
+
+**Technical:**
+- Fixed spacing where theme chips were removed
+- No TypeScript errors, build passes cleanly
 
 

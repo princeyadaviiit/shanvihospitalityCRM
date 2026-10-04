@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { getAuthenticatedUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 const updateCompanySchema = z.object({
@@ -13,9 +13,10 @@ const updateCompanySchema = z.object({
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
+    const companyId = user.companyId!; // Safe: getAuthenticatedUser ensures companyId exists
 
     const company = await prisma.company.findUnique({
-      where: { id: user.companyId },
+      where: { id: companyId },
       select: {
         id: true,
         name: true,
@@ -47,11 +48,13 @@ export async function GET(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request, ['admin']);
+    const companyId = user.companyId!; // Safe: admin users always have companyId
+
     const body = await request.json();
     const validatedData = updateCompanySchema.parse(body);
 
     const company = await prisma.company.update({
-      where: { id: user.companyId },
+      where: { id: companyId },
       data: validatedData,
       select: {
         id: true,

@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAuthenticatedUser } from '@/lib/auth/session';
+import { getAuthenticatedUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: NextRequest) {
   try {
     const user = await getAuthenticatedUser(request);
+    const companyId = user.companyId!; // Safe: getAuthenticatedUser ensures companyId exists
+
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month');
 
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
 
     const bookings = await prisma.booking.findMany({
       where: {
-        companyId: user.companyId,
+        companyId,
         status: 'CONFIRMED',
         itinerary: {
           OR: [

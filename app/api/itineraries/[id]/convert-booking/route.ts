@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { authenticateRequest } from '@/lib/auth/session';
+import { authenticateRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 export async function POST(

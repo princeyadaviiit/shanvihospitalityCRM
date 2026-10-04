@@ -1,9 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest } from '@/lib/auth/session';
+import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { createClient as createSupabaseClient } from '@supabase/supabase-js';
-import { getSupabaseEnv } from '@/lib/supabase/env';
+import { clerkClient } from '@clerk/nextjs/server';
 
 const createStaffSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -12,44 +11,54 @@ const createStaffSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticateRequest(request, ['admin']);
-  if (!auth.success) {
-    return auth.response;
-  }
+  try {
+    const user = await requireRole('admin');
+    const companyId = user.companyId!;
 
-  const { companyId } = auth.context;
-
-  const staff = await prisma.user.findMany({
-    where: { companyId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      role: true,
-      active: true,
-      createdAt: true,
-      updatedAt: true,
-      _count: {
-        select: {
-          assignedLeads: true,
+    const staff = await prisma.user.findMany({
+      where: { companyId },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        active: true,
+        createdAt: true,
+        updatedAt: true,
+        _count: {
+          select: {
+            assignedLeads: true,
+          },
         },
       },
-    },
-    orderBy: { createdAt: 'asc' },
-  });
+      orderBy: { createdAt: 'asc' },
+    });
 
-  return NextResponse.json({ staff });
+    return NextResponse.json({ staff });
+  } catch (error) {
+    console.error('Error fetching staff:', error);
+
+    if (error instanceof Error) {
+      if (error.message.includes('Unauthorized')) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+      if (error.message.includes('Forbidden')) {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+      }
+    }
+
+    return NextResponse.json(
+      { error: 'An unexpected error occurred while fetching staff' },
+      { status: 500 }
+    );
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await authenticateRequest(request, ['admin']);
-  if (!auth.success) {
-    return auth.response;
-  }
-
-  const { companyId } = auth.context;
-
   try {
+    const user = await requireRole('admin');
+    const companyId = user.companyId!;
+
     const body = await request.json();
     const validatedData = createStaffSchema.parse(body);
 
@@ -65,83 +74,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let supabaseUid = `auth_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    // Create Clerk invitation with company metadata
+    const clerk = await clerkClient();
+    const invitation = await clerk.invitations.createInvitation({
+      emailAddress: validatedData.email,
+      publicMetadata: {
+        companyId,
+        role: validatedData.role,
+        invitedBy: user.id,
+      },
+      redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
+    });
 
-    // If Supabase service role key is configured, invite via Supabase Auth admin API
-    const { url: supabaseUrl, serviceRoleKey } = getSupabaseEnv();
-
-    if (
-      supabaseUrl &&
-      serviceRoleKey &&
-      !supabaseUrl.includes('your_supabase_project_url')
-    ) {
-      try {
-        const supabaseAdmin = createSupabaseClient(supabaseUrl, serviceRoleKey, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        });
-
-        const { data: authUser, error: inviteError } =
-          await supabaseAdmin.auth.admin.inviteUserByEmail(validatedData.email, {
-            data: {
-              name: validatedData.name,
-              role: validatedData.role,
-              companyId,
-            },
-          });
-
-        if (inviteError) {
-          return NextResponse.json(
-            { error: `Supabase invite failed: ${inviteError.message}` },
-            { status: 400 }
-          );
-        }
-
-        if (authUser?.user?.id) {
-          supabaseUid = authUser.user.id;
-        }
-      } catch (adminErr) {
-        console.warn('Could not call Supabase admin invite; falling back to generated ID in dev', adminErr);
-      }
-    }
-
-    const newUser = await prisma.user.create({
+    // Create placeholder user record (will be completed when they accept invitation)
+    const newStaff = await prisma.user.create({
       data: {
-        supabaseUid,
+        clerkUserId: `pending_${invitation.id}`,
         companyId,
         name: validatedData.name,
         email: validatedData.email,
         role: validatedData.role,
-        active: true,
-      },
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        role: true,
-        active: true,
-        createdAt: true,
+        active: false, // Activated when they complete signup
       },
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Staff member added successfully',
-        user: newUser,
+    return NextResponse.json({
+      success: true,
+      staff: {
+        id: newStaff.id,
+        name: newStaff.name,
+        email: newStaff.email,
+        role: newStaff.role,
+        active: newStaff.active,
+        invitationSent: true,
       },
-      { status: 201 }
-    );
+    });
   } catch (error) {
+    console.error('Error creating staff:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error.errors[0].message },
+        { error: 'Invalid input', details: error.errors },
         { status: 400 }
       );
     }
 
-    console.error('Error adding staff member:', error);
+    if (error instanceof Error) {
+      if (error.message.includes('Unauthorized')) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+      if (error.message.includes('Forbidden')) {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+      }
+    }
+
     return NextResponse.json(
-      { error: 'An unexpected error occurred while adding staff member' },
+      { error: 'Failed to create staff member' },
       { status: 500 }
     );
   }

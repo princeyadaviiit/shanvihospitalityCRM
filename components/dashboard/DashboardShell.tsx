@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { UserButton } from '@clerk/nextjs';
 import ExecutiveOverview from './ExecutiveOverview';
 import KanbanBoard from '@/components/pipeline/KanbanBoard';
 import PackagesCatalog from '@/components/packages/PackagesCatalog';
@@ -23,12 +24,11 @@ type UserData = {
 
 type DashboardShellProps = {
   user: UserData;
-  onLogout: () => Promise<void>;
 };
 
 export type DashboardTab = 'dashboard' | 'leads' | 'tours' | 'calendar' | 'employees' | 'company';
 
-export default function DashboardShell({ user, onLogout }: DashboardShellProps) {
+export default function DashboardShell({ user }: DashboardShellProps) {
   const [activeTab, setActiveTab] = useState<DashboardTab>('dashboard');
   const [initialOpenCreateModal, setInitialOpenCreateModal] = useState(false);
   const [prefillDestination, setPrefillDestination] = useState('');
@@ -60,7 +60,7 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans selection:bg-orange-500 selection:text-white">
       {/* Top Header & Navigation */}
-      <header className="bg-slate-900 text-white border-b border-slate-800 sticky top-0 z-30 shadow-md pt-safe">
+      <header className="bg-white text-slate-900 border-b border-slate-200 sticky top-0 z-30 shadow-sm pt-safe">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-18 items-center">
             {/* Brand Identity */}
@@ -69,32 +69,32 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                 onClick={() => setActiveTab('dashboard')}
                 className="flex items-center gap-3 cursor-pointer group"
               >
-                <div className="w-10 h-10 rounded-2xl bg-orange-600 flex items-center justify-center text-white font-black text-xl shadow-md transition-transform group-hover:scale-105">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-white font-black text-xl shadow-md transition-transform group-hover:scale-105">
                   SH
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h1 className="text-base font-bold text-white tracking-tight leading-none group-hover:text-orange-400 transition-colors">
+                    <h1 className="text-base font-bold text-slate-900 tracking-tight leading-none group-hover:text-orange-600 transition-colors">
                       Shanvi Hospitality
                     </h1>
-                    <span className="hidden xl:inline-flex items-center text-[10px] font-bold uppercase tracking-wider bg-orange-500/20 text-orange-400 border border-orange-500/30 px-2 py-0.5 rounded">
+                    <span className="hidden xl:inline-flex items-center text-[10px] font-bold uppercase tracking-wider bg-orange-50 text-orange-600 border border-orange-200 px-2 py-0.5 rounded">
                       GSTIN: 09AEKFS1932F1ZX
                     </span>
                   </div>
-                  <span className="text-[11px] font-medium text-slate-400 tracking-wider">
+                  <span className="text-[11px] font-medium text-slate-600 tracking-wider">
                     Tour Operations & Lead Engine • Sector 18, Noida
                   </span>
                 </div>
               </div>
 
               {/* Desktop Navigation Tabs */}
-              <nav className="hidden lg:flex items-center gap-1 border-l border-slate-800 pl-6 h-9">
+              <nav className="hidden lg:flex items-center gap-1 border-l border-slate-200 pl-6 h-9">
                 <button
                   onClick={() => setActiveTab('dashboard')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'dashboard'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,8 +107,8 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                   onClick={() => setActiveTab('leads')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'leads'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,8 +121,8 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                   onClick={() => setActiveTab('tours')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'tours'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -135,8 +135,8 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                   onClick={() => setActiveTab('calendar')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'calendar'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -145,26 +145,40 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                   <span>Tour Departures</span>
                 </button>
 
-                <button
-                  onClick={() => setActiveTab('employees')}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
-                    activeTab === 'employees'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                  <span>Employees & Payroll</span>
-                </button>
+                {user.role === 'admin' && (
+                  <>
+                    <button
+                      onClick={() => setActiveTab('employees')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                        activeTab === 'employees'
+                          ? 'bg-orange-500 text-white shadow-sm'
+                          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                      }`}
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                      <span>Employees & Payroll</span>
+                    </button>
+                    <a
+                      href="/dashboard/admin-analytics"
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+                      target="_blank"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                      </svg>
+                      <span>Staff Analytics</span>
+                    </a>
+                  </>
+                )}
 
                 <button
                   onClick={() => setActiveTab('company')}
                   className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors flex items-center gap-1.5 cursor-pointer ${
                     activeTab === 'company'
-                      ? 'bg-orange-600 text-white shadow-sm'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
                   }`}
                 >
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -181,21 +195,28 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                 href="https://wa.me/919999885087?text=Shanvi%20Hospitality%20Helpline"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
+                className="hidden sm:flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 px-2.5 py-1.5 rounded-xl transition-colors cursor-pointer"
                 title="Direct 24/7 Helpline"
               >
-                <svg className="w-3.5 h-3.5 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="w-3.5 h-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
                 <span>+91 9999885087</span>
               </a>
 
-              <div className="flex items-center gap-2.5 border-l border-slate-800 pl-3">
-                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-orange-400">
-                  {user.name.charAt(0).toUpperCase()}
-                </div>
+              <div className="flex items-center gap-2.5 border-l border-slate-200 pl-3">
+                {/* Clerk UserButton with custom styling */}
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: 'w-8 h-8',
+                      userButtonPopoverCard: 'bg-white border border-slate-200 shadow-xl',
+                      userButtonPopoverActionButton: 'text-slate-700 hover:text-slate-900 hover:bg-slate-50',
+                    }
+                  }}
+                />
                 <div className="hidden md:block text-left">
-                  <div className="text-xs font-semibold text-white leading-none">{user.name}</div>
+                  <div className="text-xs font-semibold text-slate-900 leading-none">{user.name}</div>
                   <span
                     className={`inline-block text-[10px] font-bold px-1.5 py-0.5 mt-0.5 rounded border uppercase tracking-wider ${
                       roleBadges[user.role]
@@ -205,25 +226,16 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
                   </span>
                 </div>
               </div>
-
-              <form action={onLogout}>
-                <button
-                  type="submit"
-                  className="text-xs font-semibold text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 px-2.5 py-1.5 rounded-xl transition-colors border border-transparent hover:border-rose-500/20 cursor-pointer"
-                >
-                  Logout
-                </button>
-              </form>
             </div>
           </div>
         </div>
 
         {/* Mobile Navigation Tabs */}
-        <div className="lg:hidden flex border-t border-slate-800 px-3 py-2 gap-1 overflow-x-auto bg-slate-950/80">
+        <div className="lg:hidden flex border-t border-slate-200 px-3 py-2 gap-1 overflow-x-auto bg-slate-50">
           <button
             onClick={() => setActiveTab('dashboard')}
             className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'dashboard' ? 'bg-orange-600 text-white' : 'text-slate-400'
+              activeTab === 'dashboard' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             Dashboard
@@ -231,7 +243,7 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
           <button
             onClick={() => setActiveTab('leads')}
             className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'leads' ? 'bg-orange-600 text-white' : 'text-slate-400'
+              activeTab === 'leads' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             Leads
@@ -239,7 +251,7 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
           <button
             onClick={() => setActiveTab('tours')}
             className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'tours' ? 'bg-orange-600 text-white' : 'text-slate-400'
+              activeTab === 'tours' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             Tours
@@ -247,23 +259,25 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
           <button
             onClick={() => setActiveTab('calendar')}
             className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'calendar' ? 'bg-orange-600 text-white' : 'text-slate-400'
+              activeTab === 'calendar' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             Calendar
           </button>
-          <button
-            onClick={() => setActiveTab('employees')}
-            className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'employees' ? 'bg-orange-600 text-white' : 'text-slate-400'
-            }`}
-          >
-            Employees
-          </button>
+          {user.role === 'admin' && (
+            <button
+              onClick={() => setActiveTab('employees')}
+              className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
+                activeTab === 'employees' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
+              }`}
+            >
+              Employees
+            </button>
+          )}
           <button
             onClick={() => setActiveTab('company')}
             className={`px-3 py-1 text-xs font-semibold rounded-lg whitespace-nowrap cursor-pointer ${
-              activeTab === 'company' ? 'bg-orange-600 text-white' : 'text-slate-400'
+              activeTab === 'company' ? 'bg-orange-500 text-white' : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             Company
@@ -327,8 +341,24 @@ export default function DashboardShell({ user, onLogout }: DashboardShellProps) 
           </div>
         )}
 
-        {activeTab === 'employees' && (
+        {activeTab === 'employees' && user.role === 'admin' && (
           <EmployeeManager />
+        )}
+
+        {activeTab === 'employees' && user.role !== 'admin' && (
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center max-w-md">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-rose-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-rose-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-bold text-slate-900 mb-2">Access Restricted</h3>
+              <p className="text-sm text-slate-600">
+                The Employees & Payroll section is restricted to administrators only. Please contact your admin if you need access.
+              </p>
+            </div>
+          </div>
         )}
 
         {activeTab === 'company' && (

@@ -35,28 +35,29 @@ model Company {
   @@map("companies")
 }
 
-// Application user linked to Supabase Auth
+// Application user linked to Clerk Auth
 model User {
-  id          String   @id @default(cuid())
-  supabaseUid String   @unique @map("supabase_uid") // Links to Supabase Auth user
-  companyId   String   @map("company_id")
+  id          String    @id @default(cuid())
+  clerkUserId String    @unique @map("clerk_user_id") // Links to Clerk Auth user
+  companyId   String?   @map("company_id") // Nullable during onboarding
   name        String
   email       String
-  role        UserRole
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
+  role        UserRole? // Nullable during onboarding
+  active      Boolean   @default(true)
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
 
   // Relations
-  company       Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  company       Company?      @relation(fields: [companyId], references: [id], onDelete: Cascade)
   assignedLeads Lead[]        @relation("AssignedAgent")
+  createdLeads  Lead[]        @relation("LeadCreator")
   leadNotes     LeadNote[]
   ledgerEntries LedgerEntry[]
   calls         Call[]
   targets       Target[]
 
   @@index([companyId])
-  @@index([supabaseUid])
+  @@index([clerkUserId])
   @@map("users")
 }
 
@@ -100,12 +101,14 @@ model Lead {
   currency        String     @default("INR")
   source          String     @default("manual")
   assignedAgentId String?    @map("assigned_agent_id")
+  createdById     String?    @map("created_by_id") // Tracks who created this lead
   createdAt       DateTime   @default(now()) @map("created_at")
   updatedAt       DateTime   @updatedAt @map("updated_at")
 
   // Relations
   company       Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
   assignedAgent User?      @relation("AssignedAgent", fields: [assignedAgentId], references: [id], onDelete: SetNull)
+  createdBy     User?      @relation("LeadCreator", fields: [createdById], references: [id], onDelete: SetNull)
   notes         LeadNote[]
   itinerary     Itinerary?
   booking       Booking?
@@ -114,6 +117,7 @@ model Lead {
   @@index([companyId])
   @@index([companyId, status])
   @@index([companyId, assignedAgentId])
+  @@index([companyId, createdById])
   @@map("leads")
 }
 

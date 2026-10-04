@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest } from '@/lib/auth/session';
+import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { LeadStatus } from '@prisma/client';
 
@@ -24,14 +24,11 @@ const createLeadSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticateRequest(request, ['admin', 'staff_agent', 'accounts']);
-  if (!auth.success) {
-    return auth.response;
-  }
-
-  const { companyId, user, role } = auth.context;
-
   try {
+    const user = await requireRole('admin', 'staff_agent', 'accounts');
+    const companyId = user.companyId!;
+    const role = user.role!;
+
     const { searchParams } = new URL(request.url);
     const filterQuery = leadFilterSchema.parse({
       status: searchParams.get('status') || undefined,
@@ -75,6 +72,14 @@ export async function GET(request: NextRequest) {
             role: true,
           },
         },
+        createdBy: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            role: true,
+          },
+        },
         _count: {
           select: {
             notes: true,
@@ -102,15 +107,11 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  // Only Admin and Staff Agent can create leads
-  const auth = await authenticateRequest(request, ['admin', 'staff_agent']);
-  if (!auth.success) {
-    return auth.response;
-  }
-
-  const { companyId, user, role } = auth.context;
-
   try {
+    // Only Admin and Staff Agent can create leads
+    const user = await requireRole('admin', 'staff_agent');
+    const companyId = user.companyId!;
+    const role = user.role!;
     const body = await request.json();
     const validatedData = createLeadSchema.parse(body);
 
@@ -144,9 +145,17 @@ export async function POST(request: NextRequest) {
         currency: validatedData.currency,
         source: validatedData.source,
         assignedAgentId,
+        createdById: user.id, // Track who created this lead
       },
       include: {
         assignedAgent: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        createdBy: {
           select: {
             id: true,
             name: true,

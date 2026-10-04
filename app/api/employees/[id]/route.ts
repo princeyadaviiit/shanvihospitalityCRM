@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest } from '@/lib/auth/session';
+import { authenticateRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 const updateEmployeeSchema = z.object({
@@ -27,7 +27,7 @@ export async function GET(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const auth = await authenticateRequest(request, ['admin', 'staff_agent', 'accounts']);
+  const auth = await authenticateRequest(request, ['admin']);
   if (!auth.success) {
     return auth.response;
   }
@@ -60,7 +60,7 @@ export async function PUT(
   context: { params: Promise<{ id: string }> }
 ) {
   const { id } = await context.params;
-  const auth = await authenticateRequest(request, ['admin', 'accounts']);
+  const auth = await authenticateRequest(request, ['admin']);
   if (!auth.success) {
     return auth.response;
   }

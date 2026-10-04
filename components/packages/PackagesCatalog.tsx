@@ -11,7 +11,6 @@ type PackagesCatalogProps = {
 export default function PackagesCatalog({ onSelectPackageForQuote }: PackagesCatalogProps) {
   const [selectedType, setSelectedType] = useState<'all' | 'domestic' | 'international' | 'custom'>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedModalPackage, setSelectedModalPackage] = useState<TourPackage | null>(null);
   const [allPackages, setAllPackages] = useState<TourPackage[]>(SHANVI_PACKAGES);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
@@ -39,19 +38,12 @@ export default function PackagesCatalog({ onSelectPackageForQuote }: PackagesCat
     setAllPackages((prev) => [newPkg, ...prev]);
   };
 
-  // Extract unique categories across all packages
-  const allCategories = Array.from(
-    new Set(allPackages.flatMap((p) => p.category || []))
-  );
-
   const filteredPackages = allPackages.filter((pkg) => {
     if (selectedType === 'custom') {
       if (!pkg.isCustom) return false;
     } else if (selectedType !== 'all' && pkg.type !== selectedType) {
       return false;
     }
-
-    if (activeCategory !== 'all' && !pkg.category?.includes(activeCategory)) return false;
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
@@ -159,33 +151,6 @@ export default function PackagesCatalog({ onSelectPackageForQuote }: PackagesCat
               Custom
             </button>
           </div>
-        </div>
-
-        {/* Category Pills Bar */}
-        <div className="mt-3 flex items-center gap-1.5 overflow-x-auto pb-1">
-          <button
-            onClick={() => setActiveCategory('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-              activeCategory === 'all'
-                ? 'bg-slate-900 text-white'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-            }`}
-          >
-            All Themes
-          </button>
-          {allCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                activeCategory === cat
-                  ? 'bg-slate-900 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
         </div>
       </div>
 

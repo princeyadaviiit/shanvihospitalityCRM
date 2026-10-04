@@ -1,83 +1,53 @@
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 
-import { getSupabaseEnv } from '@/lib/supabase/env';
+// Public routes that don't require authentication
+const isPublicRoute = createRouteMatcher([
+  '/',
+  '/sign-in(.*)',
+  '/sign-up(.*)',
+  '/api/webhooks/clerk',
+  '/manifest.json',
+  '/service-worker.js',
+  '/register-sw.js',
+  '/icons/(.*)',
+  '/favicon.ico',
+]);
 
-function applySecurityHeaders(res: NextResponse): NextResponse {
-  res.headers.set('X-Frame-Options', 'DENY');
-  res.headers.set('X-Content-Type-Options', 'nosniff');
-  res.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.headers.set('Permissions-Policy', 'camera=(), microphone=(self), geolocation=()');
-  res.headers.set('X-XSS-Protection', '1; mode=block');
-  return res;
-}
+// Onboarding route - requires auth but not full onboarding
+const isOnboardingRoute = createRouteMatcher(['/onboarding', '/api/onboarding']);
 
-export async function middleware(request: NextRequest) {
-  let response = NextResponse.next({
-    request: {
-      headers: request.headers,
-    },
-  });
-  applySecurityHeaders(response);
+export default clerkMiddleware(async (auth, request) => {
+  const { userId } = await auth();
 
-  const { url: supabaseUrl, anonKey: supabaseAnonKey } = getSupabaseEnv();
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Middleware: Supabase URL or Anon Key is not configured in environment variables');
-    return response;
+  // Allow public routes
+  if (isPublicRoute(request)) {
+    return NextResponse.next();
   }
 
-  try {
-    const supabase = createServerClient(
-      supabaseUrl,
-      supabaseAnonKey,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            );
-            response = NextResponse.next({
-              request,
-            });
-            applySecurityHeaders(response);
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
-
-    const { data: { user } } = await supabase.auth.getUser();
-
-    if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-      const redirectRes = NextResponse.redirect(new URL('/login', request.url));
-      return applySecurityHeaders(redirectRes);
-    }
-
-    if (user && (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/signup')) {
-      // Do not redirect to dashboard if user arrived with an explicit error parameter (e.g. account setup pending)
-      if (!request.nextUrl.searchParams.has('error')) {
-        const redirectRes = NextResponse.redirect(new URL('/dashboard', request.url));
-        return applySecurityHeaders(redirectRes);
-      }
-    }
-  } catch (error) {
-    console.error('Middleware auth check error:', error);
-    if (request.nextUrl.pathname.startsWith('/dashboard')) {
-      const redirectRes = NextResponse.redirect(new URL('/login', request.url));
-      return applySecurityHeaders(redirectRes);
-    }
+  // Redirect to landing page if not authenticated
+  if (!userId) {
+    const signInUrl = new URL('/', request.url);
+    return NextResponse.redirect(signInUrl);
   }
 
-  return response;
-}
+  // Allow onboarding routes for authenticated users
+  if (isOnboardingRoute(request)) {
+    return NextResponse.next();
+  }
+
+  // For all other protected routes, onboarding status will be checked
+  // by the auth helpers in each API route and dashboard page
+  return NextResponse.next();
+});
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'],
+  matcher: [
+    // Skip Next.js internals and static files
+    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    // Always run for API routes
+    '/(api|trpc)(.*)',
+    // Clerk proxy routes
+    '/__clerk/:path*',
+  ],
 };

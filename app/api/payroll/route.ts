@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest } from '@/lib/auth/session';
+import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 const salaryPaymentSchema = z.object({
@@ -18,13 +18,10 @@ const salaryPaymentSchema = z.object({
 });
 
 export async function GET(request: NextRequest) {
-  const auth = await authenticateRequest(request, ['admin', 'accounts']);
-  if (!auth.success) {
-    return auth.response;
-  }
-  const companyId = auth.context.companyId;
-
   try {
+    const user = await requireRole('admin');
+    const companyId = user.companyId!;
+
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month') || undefined;
     const employeeId = searchParams.get('employeeId') || undefined;
@@ -63,6 +60,17 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error: any) {
+    console.error('Error fetching payroll:', error);
+
+    if (error instanceof Error) {
+      if (error.message.includes('Unauthorized')) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+      if (error.message.includes('Forbidden')) {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+      }
+    }
+
     return NextResponse.json(
       { error: 'Failed to retrieve payroll data', details: error.message },
       { status: 500 }
@@ -71,13 +79,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const auth = await authenticateRequest(request, ['admin', 'accounts']);
-  if (!auth.success) {
-    return auth.response;
-  }
-  const companyId = auth.context.companyId;
-
   try {
+    const user = await requireRole('admin');
+    const companyId = user.companyId!;
+
     const body = await request.json();
     const validated = salaryPaymentSchema.parse(body);
 
@@ -95,12 +100,24 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, payment }, { status: 201 });
   } catch (error: any) {
+    console.error('Error creating payroll:', error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: 'Validation failed', details: error.errors },
         { status: 400 }
       );
     }
+
+    if (error instanceof Error) {
+      if (error.message.includes('Unauthorized')) {
+        return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+      }
+      if (error.message.includes('Forbidden')) {
+        return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
+      }
+    }
+
     return NextResponse.json(
       { error: 'Failed to record salary payment', details: error.message },
       { status: 500 }

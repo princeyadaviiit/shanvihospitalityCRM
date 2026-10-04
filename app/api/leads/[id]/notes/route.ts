@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { authenticateRequest } from '@/lib/auth/session';
+import { authenticateRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
 const createNoteSchema = z.object({
