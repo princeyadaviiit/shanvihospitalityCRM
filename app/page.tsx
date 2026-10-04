@@ -73,13 +73,13 @@ export default function LandingPage() {
                 </p>
                 <div className="space-y-3">
                   <Link
-                    href="/sign-in?role=admin"
+                    href="/sign-in"
                     className="block w-full px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-bold text-sm shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition"
                   >
                     Sign In as Admin
                   </Link>
                   <Link
-                    href="/sign-up?role=admin"
+                    href="/sign-up"
                     className="block w-full px-6 py-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-900 font-semibold text-sm border border-slate-300 transition"
                   >
                     Create Company Account
@@ -101,7 +101,7 @@ export default function LandingPage() {
                 </p>
                 <div className="space-y-3">
                   <Link
-                    href="/sign-in?role=staff"
+                    href="/sign-in"
                     className="block w-full px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-bold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition"
                   >
                     Sign In as Staff

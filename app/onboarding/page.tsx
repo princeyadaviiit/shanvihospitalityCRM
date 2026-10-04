@@ -33,7 +33,8 @@ export default function OnboardingPage() {
         throw new Error(data.error || 'Failed to create company');
       }
 
-      router.push('/dashboard');
+      // Force a hard reload to ensure all server components refresh with new user data
+      window.location.href = '/dashboard';
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
@@ -41,26 +42,26 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-orange-50 flex items-center justify-center p-4">
       <div className="w-full max-w-xl">
         <div className="text-center mb-8">
           <div className="w-16 h-16 rounded-xl bg-gradient-to-tr from-orange-500 to-amber-500 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-orange-500/20 mx-auto mb-4">
             SH
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">Welcome, {user?.firstName || 'Admin'}!</h1>
-          <p className="text-slate-400">Let's set up your company profile</p>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Welcome, {user?.firstName || 'Admin'}!</h1>
+          <p className="text-slate-600">Let's set up your company profile</p>
         </div>
 
-        <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+        <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-xl">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-500/10 border border-red-500/50 rounded-xl p-4 text-red-400 text-sm">
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
                 {error}
               </div>
             )}
 
             <div>
-              <label htmlFor="companyName" className="block text-sm font-semibold text-slate-300 mb-2">
+              <label htmlFor="companyName" className="block text-sm font-semibold text-slate-700 mb-2">
                 Company Name *
               </label>
               <input
@@ -69,13 +70,13 @@ export default function OnboardingPage() {
                 required
                 value={formData.companyName}
                 onChange={(e) => setFormData({ ...formData, companyName: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="Shanvi Hospitality"
               />
             </div>
 
             <div>
-              <label htmlFor="gstNumber" className="block text-sm font-semibold text-slate-300 mb-2">
+              <label htmlFor="gstNumber" className="block text-sm font-semibold text-slate-700 mb-2">
                 GST Number (Optional)
               </label>
               <input
@@ -83,13 +84,13 @@ export default function OnboardingPage() {
                 id="gstNumber"
                 value={formData.gstNumber}
                 onChange={(e) => setFormData({ ...formData, gstNumber: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 placeholder="09AEKFS1932F1ZX"
               />
             </div>
 
             <div>
-              <label htmlFor="currency" className="block text-sm font-semibold text-slate-300 mb-2">
+              <label htmlFor="currency" className="block text-sm font-semibold text-slate-700 mb-2">
                 Default Currency *
               </label>
               <select
@@ -97,7 +98,7 @@ export default function OnboardingPage() {
                 required
                 value={formData.currency}
                 onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-3 bg-white border border-slate-300 rounded-xl text-slate-900 focus:outline-none focus:ring-2 focus:ring-orange-500"
               >
                 <option value="INR">INR (Indian Rupee)</option>
                 <option value="USD">USD (US Dollar)</option>
