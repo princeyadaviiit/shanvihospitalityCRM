@@ -63,6 +63,11 @@ export async function GET(request: NextRequest) {
       ALTER TABLE "users" ALTER COLUMN "role" DROP NOT NULL;
     `;
 
+    // Step 4.5: Make supabase_uid nullable (critical!)
+    await prisma.$executeRaw`
+      ALTER TABLE "users" ALTER COLUMN "supabase_uid" DROP NOT NULL;
+    `;
+
     // Step 5: Create unique index
     await prisma.$executeRaw`
       CREATE UNIQUE INDEX "users_clerk_user_id_key" ON "users"("clerk_user_id");
