@@ -45,3 +45,5 @@ prisma/migrations/**/migration.sql
 *~
 .claude/
 
+#debug-docs
+docs/debug docs
