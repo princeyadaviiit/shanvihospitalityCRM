@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAuth } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 
@@ -11,7 +11,15 @@ const onboardingSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await requireAuth();
+    // Use getCurrentUser instead of requireAuth - onboarding creates the company/role
+    const user = await getCurrentUser();
+
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
 
     // Check if user already has a company
     if (user.companyId) {
