@@ -70,6 +70,10 @@ export default function EmployeeManager() {
   const [selectedEmployeeForPay, setSelectedEmployeeForPay] = useState<Employee | null>(null);
   const [selectedEmployeeForView, setSelectedEmployeeForView] = useState<Employee | null>(null);
 
+  // Staff invitation options
+  const [sendInvitation, setSendInvitation] = useState(false);
+  const [systemRole, setSystemRole] = useState<'staff_agent' | 'accounts' | 'admin'>('staff_agent');
+
   // New Employee Form
   const [formData, setFormData] = useState({
     name: '',
@@ -141,18 +145,54 @@ export default function EmployeeManager() {
   const handleCreateEmployee = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // Create employee record
       const res = await fetch('/api/employees', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       });
       const data = await res.json();
+
       if (data.success) {
+        // If invitation is requested, create staff account in parallel
+        if (sendInvitation) {
+          try {
+            const staffRes = await fetch('/api/staff', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                name: formData.name,
+                email: formData.email,
+                role: systemRole,
+              }),
+            });
+            const staffData = await staffRes.json();
+
+            if (staffData.success) {
+              setActionSuccess(
+                `Employee ${formData.name} added successfully. System login invitation sent to ${formData.email}.`
+              );
+            } else {
+              setActionSuccess(
+                `Employee ${formData.name} added, but invitation failed: ${staffData.error}`
+              );
+            }
+          } catch (inviteErr) {
+            console.error('Failed to send invitation:', inviteErr);
+            setActionSuccess(
+              `Employee ${formData.name} added, but invitation could not be sent.`
+            );
+          }
+        } else {
+          setActionSuccess(`Employee ${formData.name} added successfully.`);
+        }
+
         setShowAddModal(false);
-        setActionSuccess(`Employee ${formData.name} added successfully.`);
+        setSendInvitation(false);
+        setSystemRole('staff_agent');
         fetchEmployees();
         fetchPayroll();
-        setTimeout(() => setActionSuccess(null), 4000);
+        setTimeout(() => setActionSuccess(null), 6000);
       } else {
         alert(data.error || 'Failed to create employee');
       }
@@ -755,6 +795,42 @@ export default function EmployeeManager() {
                       className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 font-mono uppercase"
                       placeholder="e.g. ABCDE1234F"
                     />
+                  </div>
+                </div>
+              </div>
+
+              {/* Staff System Access Section */}
+              <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="sendInvitation"
+                    checked={sendInvitation}
+                    onChange={(e) => setSendInvitation(e.target.checked)}
+                    className="mt-1 w-4 h-4 text-blue-600 border-blue-300 rounded focus:ring-blue-500"
+                  />
+                  <div className="flex-1">
+                    <label htmlFor="sendInvitation" className="text-sm font-semibold text-blue-900 cursor-pointer">
+                      Grant System Login Access
+                    </label>
+                    <p className="text-xs text-blue-700 mt-0.5">
+                      Send Clerk invitation email to grant CRM system access. Employee will set their own password.
+                    </p>
+
+                    {sendInvitation && (
+                      <div className="mt-3">
+                        <label className="block text-xs font-semibold text-blue-800 mb-1">System Role & Permissions</label>
+                        <select
+                          value={systemRole}
+                          onChange={(e) => setSystemRole(e.target.value as 'staff_agent' | 'accounts' | 'admin')}
+                          className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm text-blue-900 bg-white"
+                        >
+                          <option value="staff_agent">Staff Agent (Leads, Itineraries, Own Pipeline)</option>
+                          <option value="accounts">Accounts Team (Ledgers, Invoices, Read-only Access)</option>
+                          <option value="admin">Administrator (Full Access + Staff Management)</option>
+                        </select>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

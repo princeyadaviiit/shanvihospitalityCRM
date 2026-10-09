@@ -2,7 +2,7 @@
 // This file should be removed once all routes are updated to use the new auth functions directly
 
 import { getCurrentUser, requireRole, requireAuth } from '@/lib/auth';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { UserRole } from '@prisma/client';
 
 /**
@@ -28,14 +28,34 @@ export async function authenticateRequest(
   request: NextRequest,
   allowedRoles: UserRole[]
 ) {
-  const user = await requireRole(...allowedRoles);
+  try {
+    const user = await requireRole(...allowedRoles);
 
-  return {
-    success: true,
-    context: {
-      companyId: user.companyId!,
-      user,
-      role: user.role!,
-    },
-  };
+    return {
+      success: true,
+      context: {
+        companyId: user.companyId!,
+        user,
+        role: user.role!,
+      },
+      response: undefined as any,
+    };
+  } catch (error: any) {
+    // Determine appropriate status code from error message
+    let status = 500;
+    if (error.message?.includes('Unauthorized')) {
+      status = 401;
+    } else if (error.message?.includes('Forbidden')) {
+      status = 403;
+    }
+
+    return {
+      success: false,
+      context: undefined as any,
+      response: NextResponse.json(
+        { error: error.message || 'Authentication failed' },
+        { status }
+      ),
+    };
+  }
 }

@@ -5,7 +5,7 @@ import { NextRequest } from 'next/server';
 
 export type AuthUser = {
   id: string;
-  clerkUserId: string;
+  clerkUserId: string | null; // Nullable for legacy users migrated from Supabase Auth
   companyId: string | null;
   role: UserRole | null;
   name: string;
@@ -15,7 +15,7 @@ export type AuthUser = {
 
 export type AuthenticatedUser = {
   id: string;
-  clerkUserId: string;
+  clerkUserId: string; // Guaranteed non-null for Clerk-authenticated users
   companyId: string; // Guaranteed non-null for authenticated users
   role: UserRole; // Guaranteed non-null for authenticated users
   name: string;
