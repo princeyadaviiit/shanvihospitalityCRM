@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { clerkClient } from '@clerk/nextjs/server';
+import { sendStaffInvitation } from '@/lib/email';
 
 const createStaffSchema = z.object({
   name: z.string().min(1, 'Name is required'),
@@ -62,14 +62,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createStaffSchema.parse(body);
 
-    // Check if user with email already exists in any company
+    // Check if user with email already exists in THIS company only
     const existingUser = await prisma.user.findFirst({
-      where: { email: validatedData.email },
+      where: {
+        email: validatedData.email,
+        companyId: companyId, // Company-scoped check
+      },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'A user with this email address already exists in the system' },
+        { error: 'A staff member with this email already exists in your company' },
         { status: 400 }
       );
     }
@@ -87,6 +90,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Send invitation email
+    const emailResult = await sendStaffInvitation(
+      validatedData.email,
+      validatedData.name,
+      validatedData.role
+    );
+
     return NextResponse.json({
       success: true,
       staff: {
@@ -95,9 +105,11 @@ export async function POST(request: NextRequest) {
         email: newStaff.email,
         role: newStaff.role,
         active: newStaff.active,
-        invitationSent: false,
+        invitationSent: emailResult.success && emailResult.method === 'email',
       },
-      message: `Staff account created. Share sign-up link: ${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
+      message: emailResult.method === 'email'
+        ? `Staff account created and invitation email sent to ${validatedData.email}`
+        : emailResult.message,
     });
   } catch (error) {
     console.error('Error creating staff:', error);
