@@ -85,3 +85,108 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await authenticateRequest(request, ['admin']);
+  if (!auth.success) {
+    return auth.response;
+  }
+
+  const { id: staffId } = await params;
+  const { companyId, user: currentUser } = auth.context;
+
+  try {
+    console.log('🗑️ Attempting to delete staff member:', staffId);
+
+    // Verify staff exists and belongs to the admin's company
+    const targetUser = await prisma.user.findFirst({
+      where: {
+        id: staffId,
+        companyId,
+      },
+      include: {
+        _count: {
+          select: {
+            assignedLeads: true,
+            createdLeads: true,
+            leadNotes: true,
+          },
+        },
+      },
+    });
+
+    if (!targetUser) {
+      return NextResponse.json(
+        { error: 'Staff member not found in your company' },
+        { status: 404 }
+      );
+    }
+
+    // Prevent admin from deleting themselves
+    if (targetUser.id === currentUser.id) {
+      return NextResponse.json(
+        { error: 'You cannot delete your own admin account' },
+        { status: 400 }
+      );
+    }
+
+    // Check if staff has assigned data
+    const hasData = targetUser._count.assignedLeads > 0 ||
+                    targetUser._count.createdLeads > 0 ||
+                    targetUser._count.leadNotes > 0;
+
+    if (hasData) {
+      console.log('⚠️ Staff has assigned data, performing soft delete');
+      // Soft delete - deactivate instead of hard delete to preserve data integrity
+      const deactivated = await prisma.user.update({
+        where: { id: staffId },
+        data: {
+          active: false,
+          // Optionally clear sensitive fields
+          email: `deleted_${staffId}@removed.local`,
+        },
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: `Staff member deactivated (has ${targetUser._count.assignedLeads} assigned leads)`,
+        user: {
+          id: deactivated.id,
+          name: deactivated.name,
+          active: deactivated.active,
+        },
+        softDelete: true,
+      });
+    }
+
+    // Hard delete - no data associated
+    console.log('✅ Staff has no data, performing hard delete');
+    await prisma.user.delete({
+      where: { id: staffId },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: 'Staff member deleted successfully',
+      hardDelete: true,
+    });
+  } catch (error: any) {
+    console.error('❌ Error deleting staff member:', error);
+
+    // Handle foreign key constraints
+    if (error.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'Cannot delete staff member with existing data. Try deactivating instead.' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'An unexpected error occurred while deleting staff member', details: error.message },
+      { status: 500 }
+    );
+  }
+}

@@ -242,6 +242,31 @@ export default function EmployeeManager() {
     }
   };
 
+  const handleDeleteEmployee = async (emp: Employee) => {
+    const confirmMsg = `Are you sure you want to delete ${emp.name}? This will remove their employee record and all associated salary payments. This action cannot be undone.`;
+
+    if (!confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/employees/${emp.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (data.success) {
+        setActionSuccess(`Employee ${emp.name} has been deleted successfully.`);
+        fetchEmployees();
+        setTimeout(() => setActionSuccess(null), 4000);
+      } else {
+        alert(data.error || 'Failed to delete employee');
+      }
+    } catch (err) {
+      alert('Error deleting employee');
+    }
+  };
+
   const departments = ['ALL', 'Tour Planning', 'Sales', 'Operations', 'Accounts'];
 
   const filteredEmployees = employees.filter((emp) => {
@@ -502,6 +527,15 @@ export default function EmployeeManager() {
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                             </svg>
                             Disburse
+                          </button>
+                          <button
+                            onClick={() => handleDeleteEmployee(emp)}
+                            className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer flex items-center gap-1"
+                            title="Delete employee"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
                           </button>
                         </div>
                       </td>

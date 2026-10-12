@@ -31,6 +31,8 @@ export async function GET(request: NextRequest) {
     const department = searchParams.get('department') || undefined;
     const status = searchParams.get('status') || undefined;
 
+    console.log('📋 Fetching employees for company:', companyId);
+
     const employees = await (prisma as any).employee.findMany({
       where: {
         companyId,
@@ -38,12 +40,19 @@ export async function GET(request: NextRequest) {
         ...(status ? { status } : {}),
       },
       include: {
-        salaryPayments: true,
+        salaryPayments: {
+          orderBy: {
+            paymentDate: 'desc',
+          },
+          take: 5, // Only include recent payments to avoid duplicates
+        },
       },
       orderBy: {
         createdAt: 'desc',
       },
     });
+
+    console.log('✅ Found', employees.length, 'employees');
 
     return NextResponse.json({
       success: true,
