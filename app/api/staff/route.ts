@@ -62,34 +62,23 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createStaffSchema.parse(body);
 
-    // Check if user with email already exists in this company or database
+    // Check if user with email already exists in any company
     const existingUser = await prisma.user.findFirst({
       where: { email: validatedData.email },
     });
 
     if (existingUser) {
       return NextResponse.json(
-        { error: 'A user with this email address already exists' },
+        { error: 'A user with this email address already exists in the system' },
         { status: 400 }
       );
     }
 
-    // Create Clerk invitation with company metadata
-    const clerk = await clerkClient();
-    const invitation = await clerk.invitations.createInvitation({
-      emailAddress: validatedData.email,
-      publicMetadata: {
-        companyId,
-        role: validatedData.role,
-        invitedBy: user.id,
-      },
-      redirectUrl: `${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
-    });
-
-    // Create placeholder user record (will be completed when they accept invitation)
+    // Create user record without Clerk invitation
+    // User will sign up normally and webhook will link them
     const newStaff = await prisma.user.create({
       data: {
-        clerkUserId: `pending_${invitation.id}`,
+        clerkUserId: null, // Will be set when they sign up
         companyId,
         name: validatedData.name,
         email: validatedData.email,
@@ -106,8 +95,9 @@ export async function POST(request: NextRequest) {
         email: newStaff.email,
         role: newStaff.role,
         active: newStaff.active,
-        invitationSent: true,
+        invitationSent: false,
       },
+      message: `Staff account created. Share sign-up link: ${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
     });
   } catch (error) {
     console.error('Error creating staff:', error);
