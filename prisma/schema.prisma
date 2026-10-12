@@ -407,8 +407,8 @@ model SalaryPayment {
   deductions     Float    @default(0)
   netPaid        Float    @map("net_paid")
   paymentDate    DateTime @default(now()) @map("payment_date")
-  paymentMode    String   @default("NEFT") // NEFT, IMPS, UPI, CHEQUE, CASH
-  paymentStatus  String   @default("PAID") // PAID, PENDING, PROCESSING
+  paymentMode    String   @default("NEFT") @map("payment_mode") // NEFT, IMPS, UPI, CHEQUE, CASH
+  paymentStatus  String   @default("PAID") @map("payment_status") // PAID, PENDING, PROCESSING
   transactionRef String?  @map("transaction_ref")
   notes          String?
   createdAt      DateTime @default(now()) @map("created_at")

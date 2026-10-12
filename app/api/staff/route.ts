@@ -62,20 +62,31 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createStaffSchema.parse(body);
 
-    // Check if user with email already exists in THIS company only
+    console.log('📧 Creating staff with email:', validatedData.email);
+    console.log('🏢 Company ID:', companyId);
+
+    // Check if user with email already exists in THIS company only (case-insensitive)
     const existingUser = await prisma.user.findFirst({
       where: {
-        email: validatedData.email,
-        companyId: companyId, // Company-scoped check
+        email: {
+          equals: validatedData.email,
+          mode: 'insensitive', // Case-insensitive search
+        },
+        companyId: companyId,
       },
     });
 
+    console.log('🔍 Existing user found:', existingUser ? 'YES' : 'NO');
+
     if (existingUser) {
+      console.log('❌ Duplicate user detected:', existingUser.id);
       return NextResponse.json(
         { error: 'A staff member with this email already exists in your company' },
         { status: 400 }
       );
     }
+
+    console.log('✅ No duplicate found, creating new staff...');
 
     // Create user record without Clerk invitation
     // User will sign up normally and webhook will link them
@@ -90,12 +101,26 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Send invitation email
-    const emailResult = await sendStaffInvitation(
-      validatedData.email,
-      validatedData.name,
-      validatedData.role
-    );
+    // Send invitation email (non-blocking - staff creation succeeds even if email fails)
+    console.log('📨 Attempting to send invitation email...');
+    let emailResult;
+    try {
+      emailResult = await sendStaffInvitation(
+        validatedData.email,
+        validatedData.name,
+        validatedData.role
+      );
+      console.log('📧 Email result:', emailResult);
+    } catch (emailError: any) {
+      console.error('⚠️ Email sending failed (non-blocking):', emailError.message);
+      emailResult = {
+        success: false,
+        method: 'manual',
+        message: `Staff created but email failed. Share this link: ${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
+      };
+    }
+
+    console.log('✅ Staff member created successfully:', newStaff.id);
 
     return NextResponse.json({
       success: true,
