@@ -73,6 +73,9 @@ export default function LeadDetailDrawer({
   const [sendingWhatsApp, setSendingWhatsApp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isItineraryOpen, setIsItineraryOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editFormData, setEditFormData] = useState<any>({});
+  const [availableStaff, setAvailableStaff] = useState<Array<{id: string, name: string}>>([]);
 
 
   useEffect(() => {
@@ -95,6 +98,18 @@ export default function LeadDetailDrawer({
         throw new Error(data.error || 'Failed to load lead');
       }
       setLead(data.lead);
+      // Initialize edit form with current lead data
+      setEditFormData({
+        name: data.lead.name,
+        email: data.lead.email || '',
+        phone: data.lead.phone,
+        destination: data.lead.destination,
+        paxCount: data.lead.paxCount,
+        quotedPrice: data.lead.quotedPrice,
+        currency: data.lead.currency,
+        source: data.lead.source,
+        assignedAgentId: data.lead.assignedAgent?.id || null,
+      });
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -175,6 +190,69 @@ export default function LeadDetailDrawer({
     }
   }
 
+  async function handleDeleteLead() {
+    if (!lead || userRole !== 'admin') return;
+
+    const confirmed = confirm(`Are you sure you want to delete lead "${lead.name}"? This action cannot be undone.`);
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/leads/${lead.id}`, {
+        method: 'DELETE',
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Failed to delete lead');
+
+      alert('Lead deleted successfully');
+      onClose();
+      onLeadUpdated();
+    } catch (err: any) {
+      alert(err.message);
+    }
+  }
+
+  async function handleUpdateLead(e: React.FormEvent) {
+    e.preventDefault();
+    if (!lead) return;
+
+    try {
+      const res = await fetch(`/api/leads/${lead.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(editFormData),
+      });
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.error || 'Failed to update lead');
+
+      setLead(data.lead);
+      setIsEditing(false);
+      onLeadUpdated();
+      alert('Lead updated successfully');
+    } catch (err: any) {
+      alert(err.message);
+    }
+  }
+
+  async function fetchAvailableStaff() {
+    try {
+      const res = await fetch('/api/staff');
+      const data = await res.json();
+      if (data.staff) {
+        setAvailableStaff(data.staff.filter((s: any) => s.active).map((s: any) => ({id: s.id, name: s.name})));
+      }
+    } catch (err) {
+      console.error('Failed to load staff:', err);
+    }
+  }
+
+  useEffect(() => {
+    if (userRole === 'admin') {
+      fetchAvailableStaff();
+    }
+  }, [userRole]);
+
   if (!leadId) return null;
 
   return (
@@ -202,14 +280,38 @@ export default function LeadDetailDrawer({
               {lead?.destination}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {userRole === 'admin' && !isEditing && (
+              <>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="p-2 rounded-xl text-blue-600 hover:bg-blue-50 transition"
+                  title="Edit lead"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button
+                  onClick={handleDeleteLead}
+                  className="p-2 rounded-xl text-rose-600 hover:bg-rose-50 transition"
+                  title="Delete lead"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Content Body */}
@@ -228,6 +330,126 @@ export default function LeadDetailDrawer({
 
           {lead && (
             <>
+              {/* Edit Form */}
+              {isEditing && (
+                <div className="bg-blue-50 border border-blue-200 p-4 rounded-2xl">
+                  <h3 className="text-sm font-bold text-blue-900 mb-3">Edit Lead Details</h3>
+                  <form onSubmit={handleUpdateLead} className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Name</label>
+                        <input
+                          type="text"
+                          value={editFormData.name || ''}
+                          onChange={(e) => setEditFormData({...editFormData, name: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Phone</label>
+                        <input
+                          type="tel"
+                          value={editFormData.phone || ''}
+                          onChange={(e) => setEditFormData({...editFormData, phone: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">Email</label>
+                      <input
+                        type="email"
+                        value={editFormData.email || ''}
+                        onChange={(e) => setEditFormData({...editFormData, email: e.target.value})}
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Destination</label>
+                        <input
+                          type="text"
+                          value={editFormData.destination || ''}
+                          onChange={(e) => setEditFormData({...editFormData, destination: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Pax Count</label>
+                        <input
+                          type="number"
+                          value={editFormData.paxCount || 0}
+                          onChange={(e) => setEditFormData({...editFormData, paxCount: parseInt(e.target.value)})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                          min="1"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Quoted Price</label>
+                        <input
+                          type="number"
+                          value={editFormData.quotedPrice || 0}
+                          onChange={(e) => setEditFormData({...editFormData, quotedPrice: parseFloat(e.target.value)})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                          min="0"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Source</label>
+                        <input
+                          type="text"
+                          value={editFormData.source || ''}
+                          onChange={(e) => setEditFormData({...editFormData, source: e.target.value})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                        />
+                      </div>
+                    </div>
+
+                    {availableStaff.length > 0 && (
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-700 mb-1">Assign to Staff</label>
+                        <select
+                          value={editFormData.assignedAgentId || ''}
+                          onChange={(e) => setEditFormData({...editFormData, assignedAgentId: e.target.value || null})}
+                          className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm"
+                        >
+                          <option value="">Unassigned</option>
+                          {availableStaff.map(staff => (
+                            <option key={staff.id} value={staff.id}>{staff.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditing(false)}
+                        className="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold"
+                      >
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
               {/* Pipeline Stage Controller */}
               <div className="bg-slate-50 p-4 rounded-2xl border border-slate-100">
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">

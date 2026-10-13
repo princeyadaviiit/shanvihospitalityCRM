@@ -2,11 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireRole } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { sendStaffInvitation } from '@/lib/email';
+import { clerkClient } from '@clerk/nextjs/server';
 
 const createStaffSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
   role: z.enum(['admin', 'staff_agent', 'accounts']),
 });
 
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createStaffSchema.parse(body);
 
-    console.log('📧 Creating staff with email:', validatedData.email);
+    console.log('👤 Creating staff with email:', validatedData.email);
     console.log('🏢 Company ID:', companyId);
 
     // Check if user with email already exists in THIS company only (case-insensitive)
@@ -70,13 +71,11 @@ export async function POST(request: NextRequest) {
       where: {
         email: {
           equals: validatedData.email,
-          mode: 'insensitive', // Case-insensitive search
+          mode: 'insensitive',
         },
         companyId: companyId,
       },
     });
-
-    console.log('🔍 Existing user found:', existingUser ? 'YES' : 'NO');
 
     if (existingUser) {
       console.log('❌ Duplicate user detected:', existingUser.id);
@@ -86,39 +85,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('✅ No duplicate found, creating new staff...');
+    console.log('✅ No duplicate found, creating Clerk user with password...');
 
-    // Create user record without Clerk invitation
-    // User will sign up normally and webhook will link them
+    // Create Clerk user directly with email and password set by admin
+    let clerkUser;
+    try {
+      const clerk = await clerkClient();
+      clerkUser = await clerk.users.createUser({
+        emailAddress: [validatedData.email],
+        password: validatedData.password,
+        firstName: validatedData.name.split(' ')[0],
+        lastName: validatedData.name.split(' ').slice(1).join(' ') || undefined,
+        skipPasswordRequirement: false,
+        skipPasswordChecks: false,
+      });
+      console.log('✅ Clerk user created:', clerkUser.id);
+    } catch (clerkError: any) {
+      console.error('❌ Clerk user creation failed:', clerkError);
+      return NextResponse.json(
+        { error: `Failed to create login account: ${clerkError.message}` },
+        { status: 500 }
+      );
+    }
+
+    // Create user record in database with Clerk ID
     const newStaff = await prisma.user.create({
       data: {
-        clerkUserId: null, // Will be set when they sign up
+        clerkUserId: clerkUser.id,
         companyId,
         name: validatedData.name,
         email: validatedData.email,
         role: validatedData.role,
-        active: false, // Activated when they complete signup
+        active: true, // Active immediately since admin created it
       },
     });
-
-    // Send invitation email (non-blocking - staff creation succeeds even if email fails)
-    console.log('📨 Attempting to send invitation email...');
-    let emailResult;
-    try {
-      emailResult = await sendStaffInvitation(
-        validatedData.email,
-        validatedData.name,
-        validatedData.role
-      );
-      console.log('📧 Email result:', emailResult);
-    } catch (emailError: any) {
-      console.error('⚠️ Email sending failed (non-blocking):', emailError.message);
-      emailResult = {
-        success: false,
-        method: 'manual',
-        message: `Staff created but email failed. Share this link: ${process.env.NEXT_PUBLIC_APP_URL}/sign-up`,
-      };
-    }
 
     console.log('✅ Staff member created successfully:', newStaff.id);
 
@@ -130,11 +130,8 @@ export async function POST(request: NextRequest) {
         email: newStaff.email,
         role: newStaff.role,
         active: newStaff.active,
-        invitationSent: emailResult.success && emailResult.method === 'email',
       },
-      message: emailResult.method === 'email'
-        ? `Staff account created and invitation email sent to ${validatedData.email}`
-        : emailResult.message,
+      message: `Staff account created. ${validatedData.name} can now login with email: ${validatedData.email}`,
     });
   } catch (error) {
     console.error('Error creating staff:', error);

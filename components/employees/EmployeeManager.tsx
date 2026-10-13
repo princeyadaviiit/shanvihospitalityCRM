@@ -73,6 +73,7 @@ export default function EmployeeManager() {
   // Staff invitation options
   const [sendInvitation, setSendInvitation] = useState(false);
   const [systemRole, setSystemRole] = useState<'staff_agent' | 'accounts' | 'admin'>('staff_agent');
+  const [staffPassword, setStaffPassword] = useState('');
 
   // New Employee Form
   const [formData, setFormData] = useState({
@@ -154,8 +155,15 @@ export default function EmployeeManager() {
       const data = await res.json();
 
       if (data.success) {
-        // If invitation is requested, create staff account in parallel
+        // If system login is requested, create staff account with credentials
         if (sendInvitation) {
+          // Validate password is set
+          if (!staffPassword || staffPassword.length < 8) {
+            setActionSuccess(`Employee ${formData.name} added, but system login requires a password of at least 8 characters.`);
+            setTimeout(() => setActionSuccess(null), 5000);
+            return;
+          }
+
           try {
             const staffRes = await fetch('/api/staff', {
               method: 'POST',
@@ -163,6 +171,7 @@ export default function EmployeeManager() {
               body: JSON.stringify({
                 name: formData.name,
                 email: formData.email,
+                password: staffPassword,
                 role: systemRole,
               }),
             });
@@ -170,17 +179,17 @@ export default function EmployeeManager() {
 
             if (staffData.success) {
               setActionSuccess(
-                `Employee ${formData.name} added successfully. System login invitation sent to ${formData.email}.`
+                `Employee ${formData.name} added with system login. They can now login with their email and password.`
               );
             } else {
               setActionSuccess(
-                `Employee ${formData.name} added, but invitation failed: ${staffData.error}`
+                `Employee ${formData.name} added, but system login failed: ${staffData.error}`
               );
             }
           } catch (inviteErr) {
-            console.error('Failed to send invitation:', inviteErr);
+            console.error('Failed to create system login:', inviteErr);
             setActionSuccess(
-              `Employee ${formData.name} added, but invitation could not be sent.`
+              `Employee ${formData.name} added, but system login could not be created.`
             );
           }
         } else {
@@ -189,6 +198,7 @@ export default function EmployeeManager() {
 
         setShowAddModal(false);
         setSendInvitation(false);
+        setStaffPassword('');
         setSystemRole('staff_agent');
         fetchEmployees();
         fetchPayroll();
@@ -848,21 +858,39 @@ export default function EmployeeManager() {
                       Grant System Login Access
                     </label>
                     <p className="text-xs text-blue-700 mt-0.5">
-                      Send Clerk invitation email to grant CRM system access. Employee will set their own password.
+                      Create login credentials for this employee to access the CRM system.
                     </p>
 
                     {sendInvitation && (
-                      <div className="mt-3">
-                        <label className="block text-xs font-semibold text-blue-800 mb-1">System Role & Permissions</label>
-                        <select
-                          value={systemRole}
-                          onChange={(e) => setSystemRole(e.target.value as 'staff_agent' | 'accounts' | 'admin')}
-                          className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm text-blue-900 bg-white"
-                        >
-                          <option value="staff_agent">Staff Agent (Leads, Itineraries, Own Pipeline)</option>
-                          <option value="accounts">Accounts Team (Ledgers, Invoices, Read-only Access)</option>
-                          <option value="admin">Administrator (Full Access + Staff Management)</option>
-                        </select>
+                      <div className="mt-3 space-y-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-blue-800 mb-1">System Role & Permissions</label>
+                          <select
+                            value={systemRole}
+                            onChange={(e) => setSystemRole(e.target.value as 'staff_agent' | 'accounts' | 'admin')}
+                            className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm text-blue-900 bg-white"
+                          >
+                            <option value="staff_agent">Staff Agent (Leads, Itineraries, Own Pipeline)</option>
+                            <option value="accounts">Accounts Team (Ledgers, Invoices, Read-only Access)</option>
+                            <option value="admin">Administrator (Full Access + Staff Management)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-semibold text-blue-800 mb-1">Set Login Password</label>
+                          <input
+                            type="password"
+                            value={staffPassword}
+                            onChange={(e) => setStaffPassword(e.target.value)}
+                            placeholder="Minimum 8 characters"
+                            minLength={8}
+                            className="w-full px-3 py-2 border border-blue-300 rounded-lg text-sm text-blue-900 bg-white"
+                            required={sendInvitation}
+                          />
+                          <p className="text-xs text-blue-600 mt-1">
+                            Employee will use this password to login with their email address
+                          </p>
+                        </div>
                       </div>
                     )}
                   </div>

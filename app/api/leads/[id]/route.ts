@@ -188,3 +188,75 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await authenticateRequest(request, ['admin']);
+  if (!auth.success) {
+    return auth.response;
+  }
+
+  const { id: leadId } = await params;
+  const { companyId } = auth.context;
+
+  try {
+    console.log('🗑️ Attempting to delete lead:', leadId);
+
+    // Verify lead exists and belongs to company
+    const existingLead = await prisma.lead.findFirst({
+      where: {
+        id: leadId,
+        companyId,
+      },
+      include: {
+        notes: true,
+        itinerary: true,
+        booking: true,
+      },
+    });
+
+    if (!existingLead) {
+      return NextResponse.json(
+        { error: 'Lead not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if lead has booking - prevent deletion
+    if (existingLead.booking) {
+      return NextResponse.json(
+        { error: 'Cannot delete lead with an active booking. Cancel or archive the booking first.' },
+        { status: 400 }
+      );
+    }
+
+    // Delete lead and cascade will handle notes and itinerary
+    await prisma.lead.delete({
+      where: { id: leadId },
+    });
+
+    console.log('✅ Lead deleted successfully');
+
+    return NextResponse.json({
+      success: true,
+      message: 'Lead deleted successfully',
+    });
+  } catch (error: any) {
+    console.error('❌ Error deleting lead:', error);
+
+    // Handle foreign key constraints
+    if (error.code === 'P2003') {
+      return NextResponse.json(
+        { error: 'Cannot delete lead with existing dependencies' },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'An unexpected error occurred while deleting lead' },
+      { status: 500 }
+    );
+  }
+}

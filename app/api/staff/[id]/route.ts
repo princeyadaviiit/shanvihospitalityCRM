@@ -2,11 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { authenticateRequest } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { clerkClient } from '@clerk/nextjs/server';
 
 const updateStaffSchema = z.object({
   active: z.boolean().optional(),
   role: z.enum(['admin', 'staff_agent', 'accounts']).optional(),
   name: z.string().min(1).optional(),
+  email: z.string().email().optional(),
+  password: z.string().min(8).optional(),
 });
 
 export async function PATCH(
@@ -48,12 +51,38 @@ export async function PATCH(
       );
     }
 
+    // If email or password is being updated, update Clerk user
+    if (targetUser.clerkUserId && (validatedData.email || validatedData.password)) {
+      try {
+        const clerk = await clerkClient();
+        const updateData: any = {};
+
+        if (validatedData.email) {
+          updateData.emailAddress = [validatedData.email];
+        }
+
+        if (validatedData.password) {
+          updateData.password = validatedData.password;
+        }
+
+        await clerk.users.updateUser(targetUser.clerkUserId, updateData);
+        console.log('✅ Clerk user updated');
+      } catch (clerkError: any) {
+        console.error('❌ Clerk update failed:', clerkError);
+        return NextResponse.json(
+          { error: `Failed to update login credentials: ${clerkError.message}` },
+          { status: 500 }
+        );
+      }
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: staffId },
       data: {
         ...(validatedData.active !== undefined && { active: validatedData.active }),
         ...(validatedData.role !== undefined && { role: validatedData.role }),
         ...(validatedData.name !== undefined && { name: validatedData.name }),
+        ...(validatedData.email !== undefined && { email: validatedData.email }),
       },
       select: {
         id: true,
@@ -67,7 +96,7 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      message: `Staff member ${updatedUser.active ? 'updated' : 'deactivated'} successfully`,
+      message: `Staff member updated successfully`,
       user: updatedUser,
     });
   } catch (error) {
