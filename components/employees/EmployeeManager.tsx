@@ -86,9 +86,6 @@ export default function EmployeeManager() {
     baseSalary: 45000,
     allowances: 10000,
     deductions: 2500,
-    bankName: 'HDFC Bank',
-    accountNumber: '',
-    ifscCode: 'HDFC0000288',
     panNumber: '',
     commissionRate: 2.0,
     status: 'ACTIVE' as const,
@@ -464,7 +461,6 @@ export default function EmployeeManager() {
                     <th className="py-3.5 px-4">Employee</th>
                     <th className="py-3.5 px-4">Department & Role</th>
                     <th className="py-3.5 px-4">Compensation</th>
-                    <th className="py-3.5 px-4">Bank & Tax Info</th>
                     <th className="py-3.5 px-4">Status</th>
                     <th className="py-3.5 px-4 text-right">Actions</th>
                   </tr>
@@ -498,12 +494,6 @@ export default function EmployeeManager() {
                         <div className="text-xs text-rose-500">
                           Deduct: -₹{emp.deductions.toLocaleString('en-IN')}
                         </div>
-                      </td>
-
-                      <td className="py-4 px-4 text-xs">
-                        <div className="font-medium text-slate-800">{emp.bankName || 'HDFC Bank'}</div>
-                        <div className="text-slate-500 font-mono text-[11px]">A/C: {emp.accountNumber || '•••••••••'}</div>
-                        <div className="text-slate-400 font-mono text-[11px]">IFSC: {emp.ifscCode || 'HDFC0000288'}</div>
                       </td>
 
                       <td className="py-4 px-4">
@@ -554,7 +544,7 @@ export default function EmployeeManager() {
 
                   {filteredEmployees.length === 0 && !loading && (
                     <tr>
-                      <td colSpan={6} className="py-8 text-center text-sm text-slate-500">
+                      <td colSpan={5} className="py-8 text-center text-sm text-slate-500">
                         No employees found matching your criteria.
                       </td>
                     </tr>
@@ -790,56 +780,6 @@ export default function EmployeeManager() {
                   <span className="font-bold text-base text-slate-900">
                     ₹{(formData.baseSalary + formData.allowances - formData.deductions).toLocaleString('en-IN')} / month
                   </span>
-                </div>
-              </div>
-
-              {/* Bank Details */}
-              <div className="pt-2 border-t border-slate-100">
-                <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-2">Bank & Tax Details</h4>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Bank Name</label>
-                    <input
-                      type="text"
-                      value={formData.bankName}
-                      onChange={(e) => setFormData({ ...formData, bankName: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800"
-                      placeholder="e.g. HDFC Bank"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Account Number</label>
-                    <input
-                      type="text"
-                      value={formData.accountNumber}
-                      onChange={(e) => setFormData({ ...formData, accountNumber: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800"
-                      placeholder="e.g. 50100492819283"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">IFSC Code</label>
-                    <input
-                      type="text"
-                      value={formData.ifscCode}
-                      onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 font-mono"
-                      placeholder="e.g. HDFC0000288"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">PAN Number</label>
-                    <input
-                      type="text"
-                      value={formData.panNumber}
-                      onChange={(e) => setFormData({ ...formData, panNumber: e.target.value })}
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm text-slate-800 font-mono uppercase"
-                      placeholder="e.g. ABCDE1234F"
-                    />
-                  </div>
                 </div>
               </div>
 
@@ -1097,16 +1037,6 @@ export default function EmployeeManager() {
                     <span>Net Monthly Take-Home:</span>
                     <span className="text-orange-600">₹{selectedEmployeeForView.netSalary.toLocaleString('en-IN')}</span>
                   </div>
-                </div>
-              </div>
-
-              <div>
-                <span className="text-xs text-slate-500 font-semibold block uppercase mb-2">Bank & Remittance Account</span>
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs space-y-1 font-mono">
-                  <div>Bank: <span className="font-bold text-slate-800">{selectedEmployeeForView.bankName || 'HDFC Bank'}</span></div>
-                  <div>A/C: <span className="font-bold text-slate-800">{selectedEmployeeForView.accountNumber || '50100492819283'}</span></div>
-                  <div>IFSC: <span className="font-bold text-slate-800">{selectedEmployeeForView.ifscCode || 'HDFC0000288'}</span></div>
-                  <div>PAN: <span className="font-bold text-slate-800">{selectedEmployeeForView.panNumber || 'AFKPS9281M'}</span></div>
                 </div>
               </div>
 

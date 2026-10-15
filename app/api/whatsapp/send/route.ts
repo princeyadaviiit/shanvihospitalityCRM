@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { getAuthenticatedUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
+import { formatWhatsAppMessage } from '@/lib/whatsapp-formatter';
 
 const sendWhatsAppSchema = z.object({
   to: z.string().min(10, 'Valid phone number is required'),
   leadId: z.string().optional(),
+  itineraryId: z.string().optional(),
   type: z.enum(['quote', 'invoice', 'voucher', 'custom']).default('quote'),
   title: z.string().optional(),
   amount: z.number().optional(),
@@ -34,7 +36,44 @@ export async function POST(request: NextRequest) {
 
     if (!outboundText) {
       if (validated.type === 'quote') {
-        outboundText = `*Namaste from Shanvi Hospitality!* 🏔️🌴\n\nDear Guest, here is your customized tour package proposal:\n\n📋 *Tour:* ${validated.title || 'Custom Tour Package'}\n💰 *Price:* ₹${validated.amount?.toLocaleString('en-IN') || 'As discussed'} (Inclusive of private cab, hotels & sightseeing)\n\nOfficial proposal details & itinerary can be viewed online.\n\nFor any customizations, please reply to this chat.\n\nWarm regards,\n*Himani Ma'am & Team Shanvi Hospitality*\nSector 18, Noida | 📞 +91 9999885087`;
+        // If itineraryId is provided, fetch full itinerary and use rich formatting
+        if (validated.itineraryId) {
+          try {
+            const itinerary = await prisma.itinerary.findUnique({
+              where: { id: validated.itineraryId },
+              include: {
+                lead: {
+                  select: {
+                    name: true,
+                    paxCount: true,
+                  },
+                },
+                days: {
+                  include: {
+                    lineItems: true,
+                  },
+                  orderBy: {
+                    dayNumber: 'asc',
+                  },
+                },
+              },
+            });
+
+            if (itinerary) {
+              outboundText = formatWhatsAppMessage(itinerary as any, itinerary.lead.name);
+            } else {
+              // Fallback to simple message
+              outboundText = `*Namaste from Shanvi Hospitality!* 🏔️🌴\n\nDear Guest, here is your customized tour package proposal:\n\n📋 *Tour:* ${validated.title || 'Custom Tour Package'}\n💰 *Price:* ₹${validated.amount?.toLocaleString('en-IN') || 'As discussed'} (Inclusive of private cab, hotels & sightseeing)\n\nOfficial proposal details & itinerary can be viewed online.\n\nFor any customizations, please reply to this chat.\n\nWarm regards,\n*Himani Ma'am & Team Shanvi Hospitality*\nSector 18, Noida | 📞 +91 9999885087`;
+            }
+          } catch (err) {
+            console.error('Error fetching itinerary for WhatsApp:', err);
+            // Fallback to simple message
+            outboundText = `*Namaste from Shanvi Hospitality!* 🏔️🌴\n\nDear Guest, here is your customized tour package proposal:\n\n📋 *Tour:* ${validated.title || 'Custom Tour Package'}\n💰 *Price:* ₹${validated.amount?.toLocaleString('en-IN') || 'As discussed'} (Inclusive of private cab, hotels & sightseeing)\n\nOfficial proposal details & itinerary can be viewed online.\n\nFor any customizations, please reply to this chat.\n\nWarm regards,\n*Himani Ma'am & Team Shanvi Hospitality*\nSector 18, Noida | 📞 +91 9999885087`;
+          }
+        } else {
+          // Simple quote without itinerary details
+          outboundText = `*Namaste from Shanvi Hospitality!* 🏔️🌴\n\nDear Guest, here is your customized tour package proposal:\n\n📋 *Tour:* ${validated.title || 'Custom Tour Package'}\n💰 *Price:* ₹${validated.amount?.toLocaleString('en-IN') || 'As discussed'} (Inclusive of private cab, hotels & sightseeing)\n\nOfficial proposal details & itinerary can be viewed online.\n\nFor any customizations, please reply to this chat.\n\nWarm regards,\n*Himani Ma'am & Team Shanvi Hospitality*\nSector 18, Noida | 📞 +91 9999885087`;
+        }
       } else if (validated.type === 'invoice') {
         outboundText = `*Shanvi Hospitality — Official Tax Invoice* 📄\n\nDear Guest, thank you for confirming your holiday. Your GST Tax Invoice has been generated.\n\n💰 *Total Amount:* ₹${validated.amount?.toLocaleString('en-IN') || ''}\n\nPlease find your booking receipt. For any assistance, reach us at +91 9999885087.\n\n*Shanvi Hospitality Noida*`;
       } else if (validated.type === 'voucher') {

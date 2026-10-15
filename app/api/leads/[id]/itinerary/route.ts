@@ -8,6 +8,24 @@ const lineItemSchema = z.object({
   category: z.nativeEnum(LineItemCategory),
   description: z.string().min(1, 'Line item description is required'),
   cost: z.number().min(0, 'Cost must be 0 or positive').default(0),
+
+  // Hotel/Accommodation fields
+  hotelName: z.string().optional().nullable(),
+  hotelStarRating: z.number().int().min(1).max(5).optional().nullable(),
+  mealPlan: z.string().optional().nullable(),
+  roomType: z.string().optional().nullable(),
+  checkInDate: z.string().optional().nullable(),
+  checkOutDate: z.string().optional().nullable(),
+  nightsCount: z.number().int().min(1).optional().nullable(),
+
+  // Transportation fields
+  vehicleType: z.string().optional().nullable(),
+  transferType: z.string().optional().nullable(),
+  startTime: z.string().optional().nullable(),
+
+  // Activity/Tour fields
+  activityType: z.string().optional().nullable(),
+  paxCount: z.string().optional().nullable(),
 });
 
 const itineraryDaySchema = z.object({
@@ -22,8 +40,13 @@ const saveItinerarySchema = z.object({
   destination: z.string().min(1, 'Destination is required'),
   startDate: z.string().optional().nullable(),
   endDate: z.string().optional().nullable(),
+  adultsCount: z.number().int().min(0).optional().nullable(),
+  childrenCount: z.number().int().min(0).optional().nullable(),
+  childrenAges: z.string().optional().nullable(),
   markup: z.number().min(0, 'Markup cannot be negative').default(0),
   currency: z.string().default('INR'),
+  inclusions: z.string().optional().nullable(),
+  exclusions: z.string().optional().nullable(),
   days: z.array(itineraryDaySchema).min(1, 'At least 1 day is required in the itinerary'),
 });
 
@@ -149,10 +172,15 @@ export async function POST(
           destination: validatedData.destination,
           startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
           endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
+          adultsCount: validatedData.adultsCount || null,
+          childrenCount: validatedData.childrenCount || null,
+          childrenAges: validatedData.childrenAges || null,
           markup: validatedData.markup,
           totalCost,
           finalPrice,
           currency: validatedData.currency,
+          inclusions: validatedData.inclusions || null,
+          exclusions: validatedData.exclusions || null,
         },
       });
 
@@ -169,6 +197,18 @@ export async function POST(
                 category: li.category,
                 description: li.description,
                 cost: li.cost,
+                hotelName: li.hotelName || null,
+                hotelStarRating: li.hotelStarRating || null,
+                mealPlan: li.mealPlan || null,
+                roomType: li.roomType || null,
+                checkInDate: li.checkInDate ? new Date(li.checkInDate) : null,
+                checkOutDate: li.checkOutDate ? new Date(li.checkOutDate) : null,
+                nightsCount: li.nightsCount || null,
+                vehicleType: li.vehicleType || null,
+                transferType: li.transferType || null,
+                startTime: li.startTime || null,
+                activityType: li.activityType || null,
+                paxCount: li.paxCount || null,
               })),
             },
           },
@@ -194,10 +234,15 @@ export async function POST(
           destination: validatedData.destination,
           startDate: validatedData.startDate ? new Date(validatedData.startDate) : null,
           endDate: validatedData.endDate ? new Date(validatedData.endDate) : null,
+          adultsCount: validatedData.adultsCount || null,
+          childrenCount: validatedData.childrenCount || null,
+          childrenAges: validatedData.childrenAges || null,
           markup: validatedData.markup,
           totalCost,
           finalPrice,
           currency: validatedData.currency,
+          inclusions: validatedData.inclusions || null,
+          exclusions: validatedData.exclusions || null,
           days: {
             create: validatedData.days.map((d) => ({
               dayNumber: d.dayNumber,
@@ -208,6 +253,18 @@ export async function POST(
                   category: li.category,
                   description: li.description,
                   cost: li.cost,
+                  hotelName: li.hotelName || null,
+                  hotelStarRating: li.hotelStarRating || null,
+                  mealPlan: li.mealPlan || null,
+                  roomType: li.roomType || null,
+                  checkInDate: li.checkInDate ? new Date(li.checkInDate) : null,
+                  checkOutDate: li.checkOutDate ? new Date(li.checkOutDate) : null,
+                  nightsCount: li.nightsCount || null,
+                  vehicleType: li.vehicleType || null,
+                  transferType: li.transferType || null,
+                  startTime: li.startTime || null,
+                  activityType: li.activityType || null,
+                  paxCount: li.paxCount || null,
                 })),
               },
             })),

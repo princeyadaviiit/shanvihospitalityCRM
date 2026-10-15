@@ -40,6 +40,7 @@ model Company {
 model User {
   id          String    @id @default(cuid())
   clerkUserId String?   @unique @map("clerk_user_id") // Links to Clerk Auth user - nullable for legacy users
+  supabaseUid String?   @map("supabase_uid") // Legacy Supabase Auth UID - kept for RLS policies
   companyId   String?   @map("company_id") // Nullable during onboarding
   name        String
   email       String
@@ -152,6 +153,16 @@ model Itinerary {
   totalCost   Float     @default(0) @map("total_cost")
   finalPrice  Float     @default(0) @map("final_price")
   currency    String    @default("INR")
+
+  // Additional trip details
+  adultsCount    Int?     @default(0) @map("adults_count")
+  childrenCount  Int?     @default(0) @map("children_count")
+  childrenAges   String?  @map("children_ages") // JSON array of ages
+
+  // Inclusions and Exclusions
+  inclusions  String?  // JSON array of inclusion items
+  exclusions  String?  // JSON array of exclusion items
+
   createdAt   DateTime  @default(now()) @map("created_at")
   updatedAt   DateTime  @updatedAt @map("updated_at")
 
@@ -188,6 +199,25 @@ model ItineraryLineItem {
   category    LineItemCategory
   description String
   cost        Float            @default(0)
+
+  // Hotel/Accommodation fields
+  hotelName       String?   @map("hotel_name")
+  hotelStarRating Int?      @map("hotel_star_rating")
+  mealPlan        String?   @map("meal_plan") // Bed and Breakfast, Half Board, Full Board, etc.
+  roomType        String?   @map("room_type")
+  checkInDate     DateTime? @map("check_in_date")
+  checkOutDate    DateTime? @map("check_out_date")
+  nightsCount     Int?      @map("nights_count")
+
+  // Transportation fields
+  vehicleType     String?   @map("vehicle_type") // e.g., "16 Seater", "Sedan", "SUV"
+  transferType    String?   @map("transfer_type") // e.g., "One Way", "Two Way", "Round Trip"
+  startTime       String?   @map("start_time")
+
+  // Activity/Tour fields
+  activityType    String?   @map("activity_type") // e.g., "SIC Tour", "Pvt Transfer + Guide", "Ticket"
+  paxCount        String?   @map("pax_count") // e.g., "4Ad. + 2Ch."
+
   createdAt   DateTime         @default(now()) @map("created_at")
   updatedAt   DateTime         @updatedAt @map("updated_at")
 
