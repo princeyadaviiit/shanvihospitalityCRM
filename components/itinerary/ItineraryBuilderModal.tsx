@@ -300,38 +300,106 @@ export default function ItineraryBuilderModal({
     if (e) e.preventDefault();
     if (userRole === 'accounts') return;
 
+    // Validate required fields
+    if (!title.trim()) {
+      setError('Itinerary title is required');
+      return;
+    }
+
+    if (!destination.trim()) {
+      setError('Destination is required');
+      return;
+    }
+
+    if (days.length === 0) {
+      setError('At least one day is required in the itinerary');
+      return;
+    }
+
+    // Validate each day has a title
+    for (let i = 0; i < days.length; i++) {
+      if (!days[i].title.trim()) {
+        setError(`Day ${i + 1} must have a title`);
+        return;
+      }
+    }
+
     setSaving(true);
     setError(null);
     try {
       const payload = {
-        title,
-        destination,
+        title: title.trim(),
+        destination: destination.trim(),
         startDate: startDate || null,
         endDate: endDate || null,
-        adultsCount,
-        childrenCount,
-        childrenAges: childrenAges || null,
+        adultsCount: Number(adultsCount) || 0,
+        childrenCount: Number(childrenCount) || 0,
+        childrenAges: childrenAges.trim() || null,
         markup: Number(markup) || 0,
-        currency,
-        inclusions: JSON.stringify(inclusions),
-        exclusions: JSON.stringify(exclusions),
-        days,
+        currency: currency || 'INR',
+        inclusions: inclusions.length > 0 ? JSON.stringify(inclusions) : null,
+        exclusions: exclusions.length > 0 ? JSON.stringify(exclusions) : null,
+        days: days.map(day => ({
+          dayNumber: Number(day.dayNumber),
+          title: day.title.trim(),
+          description: day.description?.trim() || null,
+          lineItems: day.lineItems.map(item => ({
+            category: item.category,
+            description: item.description.trim(),
+            cost: Number(item.cost) || 0,
+            // Hotel fields
+            hotelName: item.hotelName?.trim() || null,
+            hotelStarRating: item.hotelStarRating ? Number(item.hotelStarRating) : null,
+            mealPlan: item.mealPlan?.trim() || null,
+            roomType: item.roomType?.trim() || null,
+            checkInDate: item.checkInDate || null,
+            checkOutDate: item.checkOutDate || null,
+            nightsCount: item.nightsCount ? Number(item.nightsCount) : null,
+            // Transport fields
+            vehicleType: item.vehicleType?.trim() || null,
+            transferType: item.transferType?.trim() || null,
+            startTime: item.startTime || null,
+            // Activity fields
+            activityType: item.activityType?.trim() || null,
+            paxCount: item.paxCount?.trim() || null,
+          })),
+        })),
       };
+
+      console.log('Sending payload:', JSON.stringify(payload, null, 2));
 
       const res = await fetch(`/api/leads/${leadId}/itinerary`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(payload),
       });
 
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to save itinerary');
+
+      if (!res.ok) {
+        console.error('API Error Response:', data);
+
+        // Format error message
+        let errorMessage = data.error || 'Failed to save itinerary';
+
+        if (data.details && Array.isArray(data.details)) {
+          errorMessage += '\n\n' + data.details.join('\n');
+        } else if (data.details && typeof data.details === 'string') {
+          errorMessage += '\n\n' + data.details;
+        }
+
+        throw new Error(errorMessage);
+      }
 
       setItineraryId(data.itinerary?.id);
       onSaved();
       alert('Itinerary and quote successfully saved!');
     } catch (err: any) {
-      setError(err.message);
+      console.error('Save error:', err);
+      setError(err.message || 'Failed to save itinerary');
+      alert('Error: ' + (err.message || 'Failed to save itinerary'));
     } finally {
       setSaving(false);
     }
@@ -658,7 +726,11 @@ export default function ItineraryBuilderModal({
                             value={day.title}
                             onChange={(e) => updateDayField(dIdx, 'title', e.target.value)}
                             placeholder={`Day ${day.dayNumber} Title`}
+                            required
+                            minLength={3}
+                            maxLength={200}
                             className="flex-1 px-3 py-1.5 text-sm font-bold rounded-lg border border-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800"
+                            title="Enter a title for this day (3-200 characters)"
                           />
                           {userRole !== 'accounts' && days.length > 1 && (
                             <button
@@ -984,9 +1056,12 @@ export default function ItineraryBuilderModal({
                       <input
                         type="number"
                         min="0"
+                        max="9999999"
+                        step="1"
                         value={markup}
                         onChange={(e) => setMarkup(Number(e.target.value) || 0)}
                         className="w-full text-base font-bold text-slate-800 border-b border-dashed border-slate-300 focus:outline-none focus:border-blue-500 bg-transparent"
+                        title="Enter markup amount (0-9999999)"
                       />
                     </div>
                   </div>

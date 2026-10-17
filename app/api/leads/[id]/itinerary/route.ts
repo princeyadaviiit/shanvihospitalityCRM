@@ -135,7 +135,26 @@ export async function POST(
   }
 
   try {
-    const body = await request.json();
+    // Parse request body with better error handling
+    let body;
+    try {
+      const text = await request.text();
+      if (!text || text.trim() === '') {
+        return NextResponse.json(
+          { error: 'Request body is empty. Please provide itinerary data including title, destination, and at least one day.' },
+          { status: 400 }
+        );
+      }
+      body = JSON.parse(text);
+    } catch (parseError) {
+      console.error('JSON Parse Error:', parseError);
+      return NextResponse.json(
+        { error: 'Invalid JSON format. Please check your request data and ensure all fields are properly formatted.' },
+        { status: 400 }
+      );
+    }
+
+    // Validate with detailed error messages
     const validatedData = saveItinerarySchema.parse(body);
 
     // Calculate auto cost total from all line items across days
@@ -301,15 +320,39 @@ export async function POST(
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Format validation errors with field names and expected types
+      const formattedErrors = error.errors.map(err => {
+        const field = err.path.join('.');
+        let message = err.message;
+
+        // Add expected type information
+        if (err.code === 'invalid_type') {
+          message = `${field}: Expected ${err.expected}, but received ${err.received}. ${message}`;
+        } else if (err.code === 'too_small') {
+          message = `${field}: ${message}`;
+        } else {
+          message = `${field}: ${message}`;
+        }
+
+        return message;
+      });
+
       return NextResponse.json(
-        { error: error.errors[0].message },
+        {
+          error: 'Validation failed. Please check the following fields:',
+          details: formattedErrors,
+          validationErrors: error.errors
+        },
         { status: 400 }
       );
     }
 
     console.error('Error saving itinerary:', error);
     return NextResponse.json(
-      { error: 'An unexpected error occurred while saving itinerary' },
+      {
+        error: 'An unexpected error occurred while saving itinerary',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
       { status: 500 }
     );
   }
